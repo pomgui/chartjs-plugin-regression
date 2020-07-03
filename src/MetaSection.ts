@@ -1,5 +1,5 @@
 import * as regression from "regression";
-import { Section, Type, LineOptions, ChartDataSetsEx, BasicOptions, OverwritingType, CalculationOptions } from "./types";
+import { Section, Type, LineOptions, ChartDataSetsEx, BasicOptions, OverwritingType, CalculationOptions, CopyOptions } from "./types";
 import { MetaDataSet } from "./MetaData";
 
 const
@@ -14,7 +14,10 @@ const
             color: '#000',
             dash: []
         },
-        extendPredictions: false
+        extendPredictions: false,
+        copy: {
+            overwriteData: 'none'
+        }
     };
 
 export interface Result extends regression.Result {
@@ -29,7 +32,7 @@ export class MetaSection implements Section, BasicOptions {
     extendPredictions: boolean;
     copySectionIndex?: number;
     result?: regression.Result;
-    copyOverData?: OverwritingType;
+    copy: CopyOptions;
     calculation: CalculationOptions;
 
     constructor(sec: Section, private _meta: MetaDataSet) {
@@ -38,14 +41,14 @@ export class MetaSection implements Section, BasicOptions {
         // Copying from user config
         this.copySectionIndex = sec.copySectionIndex;
         // Calculate inherited configuration
-        const cfg = getConfig(['type', 'calculation', 'line', 'extendPredictions', 'copyOverData']);
+        const cfg = getConfig(['type', 'calculation', 'line', 'extendPredictions', 'copy']);
         this.startIndex = sec.startIndex || 0;
         this.endIndex = sec.endIndex || ds.data!.length - 1;
         this.type = Array.isArray(cfg.type) ? cfg.type : [cfg.type];
         this.line = cfg.line;
         this.calculation = cfg.calculation;
         this.extendPredictions = cfg.extendPredictions;
-        this.copyOverData = cfg.copyOverData;
+        this.copy = cfg.copy;
         validate(this.type);
 
         // --- constructor helpers
@@ -87,7 +90,7 @@ export class MetaSection implements Section, BasicOptions {
             const
                 from = meta.sections[this.copySectionIndex],
                 r = this.result = Object.assign({}, from.result),
-                overwrite = this.copyOverData,
+                overwrite = this.copy.overwriteData,
                 data = ds.data!;
             r.points = sectionData.map(p => r.predict(p[0])) as any;
             delete r.r2;
@@ -100,8 +103,11 @@ export class MetaSection implements Section, BasicOptions {
                             overwrite == 'last' && index == this.endIndex ||
                             overwrite == 'empty' && !data[index]
                         )
-                    )
+                    ) {
+                        if (this.copy.maxValue) value = Math.min(this.copy.maxValue, value);
+                        if (this.copy.minValue) value = Math.max(this.copy.minValue, value);
                         data[index] = value;
+                    }
                 });
         }
     }

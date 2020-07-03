@@ -1,5 +1,4 @@
 import { ChartDataSets } from 'chart.js';
-import { MetaSection } from './MetaSection';
 import * as regression from 'regression';
 
 export type Type = 'copy' | 'linear' | 'exponential' | 'power' | 'polynomial' | 'logarithmic';
@@ -13,6 +12,20 @@ export interface LineOptions {
 
 export type CalculationOptions = regression.Options;
 
+export interface CopyOptions {
+    /** 
+     * none - No data will be overwriten (default)
+     * all  - All data will be overwriten.
+     * empty- Only zero, undefined, or null data will be overwriten.
+     * last - Only the last item (data[endIndex]) will be overwriten.
+     */
+    overwriteData?: OverwritingType;
+    /** Minimum value that the predicted value can be written into the data */
+    minValue?: number;
+    /** Maximum value that the predicted value can be written into the data */
+    maxValue?: number;
+}
+
 export interface BasicOptions {
     /** Type of regression to be calculated for all the sections unless they define their own type */
     type?: Type | Type[];
@@ -22,19 +35,15 @@ export interface BasicOptions {
     calculation?: CalculationOptions;
     /** Previous sections predictions for the current section will be drawed as dashed lines */
     extendPredictions?: boolean;
-    /** 
-     * If type=='copy' the dataset's data could be overwriten:
-     * none - No data will be overwriten (default)
-     * all  - All data will be overwriten.
-     * empty- Only zero, undefined, or null data will be overwriten.
-     * last - Only the last item (data[endIndex]) will be overwriten.
-     */
-    copyOverData?: OverwritingType;
+    /** * Only if type=='copy' */
+    copy?: CopyOptions;
 }
 
 export interface Section extends BasicOptions {
-    startIndex: number;
-    endIndex: number;
+    /** Start index on dataset's data. Default: 0 */
+    startIndex?: number;
+    /** End index on dataset's data. Default: data.length-1 */
+    endIndex?: number;
     /**
      * If type=='copy' no regression will be calculated, but the data will 
      * be filled from the predictions calculated by the regression in 
@@ -44,7 +53,6 @@ export interface Section extends BasicOptions {
 }
 
 export interface ChartDataSetsEx extends ChartDataSets {
-    $$id: number;
     regressions: DatasetConfig
 }
 

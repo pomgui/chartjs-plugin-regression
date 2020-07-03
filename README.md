@@ -44,7 +44,7 @@ new Chart(ctx, {
     plugins: {
       regressions: {
         // Global configuration of the plugin, these values will be used unless each dataset defines their own
-        type, line, precision, extendPredictions,
+        type, line, calculation, extendPredictions, copyOverData,
         // Callback function to know when the calculation have been completed for all the datasets.
         onCompleteCalculation: (chart)=> ...
       }

@@ -1,7 +1,12 @@
 import { MetaDataSet } from './MetaData';
-import { PluginServiceGlobalRegistration, PluginServiceRegistrationOptions } from 'chart.js';
+import { PluginServiceGlobalRegistration, PluginServiceRegistrationOptions, Easing } from 'chart.js';
 import { MetaSection } from './MetaSection';
 import { ChartDataSetsEx, OptionsConfig } from './types';
+
+// Cache for all plugins' metadata
+var _metadataMap: any = {};
+var _chartId = 0;
+
 
 interface ChartEx extends Chart {
     $$id: number;
@@ -10,26 +15,23 @@ interface ChartEx extends Chart {
 class Plugin implements PluginServiceGlobalRegistration, PluginServiceRegistrationOptions {
     id = 'regressions';
 
-    private _chartId = 0;
-    private _metadataMap = new Map<number, MetaDataSet>();
-
     beforeInit(chart: any) {
-        chart.$$id = ++this._chartId;
+        chart.$$id = ++_chartId;
     }
 
     /**
      * Called after update (when the chart is created and when chart.update() is called)
      * @param chart 
      */
-    beforeUpdate(chart: ChartEx) {
+    beforeUpdate?(chart: Chart, options?: any): void {
         let o, p, r: OptionsConfig;
         const onComplete = (o = chart.config.options) && (p = o.plugins)
             && (r = p.regressions) && r.onCompleteCalculation;
 
         forEach(chart, (ds, meta, datasetIndex) => {
             meta = new MetaDataSet(chart, ds);
-            const id = chart.$$id * 1000 + datasetIndex;
-            this._metadataMap.set(id, meta);
+            const id = (chart as ChartEx).$$id * 1000 + datasetIndex;
+            _metadataMap[id] = meta;
         });
         if (onComplete)
             onComplete(chart);
@@ -39,24 +41,24 @@ class Plugin implements PluginServiceGlobalRegistration, PluginServiceRegistrati
      * It's called once before all the drawing
      * @param chart 
      */
-    beforeRender(chart: ChartEx) {
+    beforeRender(chart: Chart, options?: any): void {
         forEach(chart, (ds, meta) => meta.adjustScales());
     }
 
-    afterDatasetsDraw(chart: ChartEx) {
+    afterDatasetsDraw(chart: Chart, easing: Easing, options?: any): void {
         forEach(chart, (ds, meta) => meta.draw());
     }
 
-    destroy(chart: ChartEx) {
-        Array.from(this._metadataMap.keys())
-            .filter(k => (k / 1000) >> 0 == chart.$$id)
-            .forEach(k => this._metadataMap.delete(k));
+    destroy(chart: Chart): void {
+        Object.keys(_metadataMap)
+            .filter((k: any) => (k / 1000) >> 0 == (chart as ChartEx).$$id)
+            .forEach(k => delete _metadataMap[k]);
     }
 
     /** Get dataset's meta data */
     getDataset(chart: ChartEx, datasetIndex: number): MetaDataSet {
         const id = chart.$$id * 1000 + datasetIndex;
-        return this._metadataMap.get(id)!;
+        return _metadataMap[id];
     }
 
     /** Get dataset's meta sections */
