@@ -1,0 +1,8 @@
+{
+   "extends": ["tslint:recommended", "tslint-config-prettier"],
+   "rules": {
+      "triple-equals": false,
+      "one-variable-per-declaration": false,
+      "no-bitwise": false
+   }
+}

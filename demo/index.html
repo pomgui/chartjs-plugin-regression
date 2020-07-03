@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>chartjs-plugin-regressions</title>
+    <script
+        src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.0/angular.min.js"></script>
+    <link rel="stylesheet" href="demo.css">
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.js"></script>
+    <script type="text/javascript"
+        src="../dist/chartjs-plugin-regression.js"></script>
+    <script type="text/javascript" src="./demoData.js"></script>
+    <script type="text/javascript" src="./demoHelpers.js"></script>
+    <script type="text/javascript" src="./demo.js"></script>
+</head>
+
+<body ng-app="demoApp">
+    <div ng-controller="DemoController as $ctrl">
+        <div ng-repeat="group in $ctrl.groups">
+            <h1 ng-bind="group.title"></h1>
+            <div class="sample" ng-repeat="sample in group.samples">
+                <h2 ng-bind="sample.subtitle"></h2>
+                <div class="chart cntr">
+                    <pi-chart sample="sample">
+                    </pi-chart>
+                </div>
+                <div class="params cntr">
+                    <div>
+                        <div ng-if="sample.optionsCfg">
+                            <h3>Options Config</h3>
+                            <pre
+                                ng-bind="$ctrl.format(sample.optionsCfg)"></pre>
+                        </div>
+                        <div ng-if="sample.datasetCfg">
+                            <h3>Dataset Config</h3>
+                            <pre
+                                ng-bind="$ctrl.format(sample.datasetCfg)"></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

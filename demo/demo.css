@@ -1,0 +1,63 @@
+body * {
+    box-sizing: border-box;
+}
+
+h1,h2,h3{
+    margin-bottom: 0;
+}
+
+.sample {
+    height: 300px;
+}
+
+.cntr {
+    position: relative;
+    padding : 10px;
+    height  : 100%;
+}
+
+.cntr>* {
+    position: absolute;
+    left    : 0;
+    top     : 0;
+    right   : 0;
+    bottom  : 0;
+    overflow: auto;
+    border  : 1px solid #aaa;
+    padding : 5px;
+    margin  : 5px;
+}
+
+.cntr.chart {
+    width: 70%;
+    float: left;
+}
+
+.cntr.params {
+    width: 30%;
+    float: right;
+}
+
+pi-chart canvas {
+    width : 100%;
+    height: 100%;
+}
+
+pi-chart>.info {
+    font    : 16px Arial, helvetica, sans-serif;
+    position: absolute;
+    left    : 52px;
+    top     : 48px;
+}
+
+.info,
+.info td {
+    border          : 1px solid #aaa;
+    background-color: #fff8;
+}
+
+button {
+    position: absolute;
+    right   : 0;
+    top     : 0;
+}
