@@ -24,7 +24,7 @@ var demo = new function () {
                 {
                     subtitle: 'Polynomial regression',
                     // optionsCfg: {},
-                    datasetCfg: { type: 'polynomial', line: { color: '#0000ff', width: 3 }, precision: 10 }
+                    datasetCfg: { type: 'polynomial', line: { color: '#0000ff', width: 3 }, calculation: { precision: 10, order: 4 } }
                 },
                 {
                     subtitle: 'Power regression',
@@ -34,7 +34,7 @@ var demo = new function () {
                 {
                     subtitle: 'Logarithmic',
                     // optionsCfg: {},
-                    datasetCfg: { type: 'logarithmic', precision: 10, line: { color: '#0000ff', width: 3 } }
+                    datasetCfg: { type: 'logarithmic', calculation: { precision: 10 }, line: { color: '#0000ff', width: 3 } }
                 },
             ]
         }, {
@@ -43,7 +43,7 @@ var demo = new function () {
                 {
                     subtitle: 'Best R² between Exponential and Polynomial',
                     // optionsCfg: {},
-                    datasetCfg: { type: ['exponential', 'polynomial'], line: { color: '#0000ff', width: 3 } }
+                    datasetCfg: { type: ['exponential', 'polynomial'], line: { color: '#0000ff', width: 3 }, calculation: { order: 3 } }
                 },
             ]
         }, {
@@ -70,7 +70,7 @@ var demo = new function () {
                         type: ['linear', 'exponential', 'polynomial'],
                         extendPredictions: true,
                         sections: [
-                            { startIndex: 0, endIndex: this.NUM_ELEMS_2, line: { color: 'red' } },
+                            { endIndex: this.NUM_ELEMS_2, line: { color: 'red' } },
                             { startIndex: this.NUM_ELEMS_2, endIndex: this.NUM_NORMAL_ELEMS - 1 }
                         ]
                     }
@@ -87,32 +87,29 @@ var demo = new function () {
                     datasetCfg: {
                         line: { width: 3, color: 'blue' },
                         sections: [
-                            { type: 'linear', startIndex: 0, endIndex: this.NUM_NORMAL_ELEMS - 1, line: { width: 1.5 } },
-                            { type: 'polynomial', startIndex: 0, endIndex: this.NUM_NORMAL_ELEMS - 1, line: { color: 'orange', dash: [8, 2] } },
-                            { type: 'exponential', startIndex: 0, endIndex: this.NUM_NORMAL_ELEMS - 1, line: { color: 'red' } },
+                            { type: 'linear', line: { width: 1.5 } },
+                            { type: 'polynomial', line: { color: 'orange', dash: [8, 2] } },
+                            { type: 'exponential', line: { color: 'red' } },
                         ]
                     }
-                },]
+                },
+                {
+                    subtitle: 'One dataset with 3 polynomial with different order',
+                    chartType: 'line',
+                    optionsCfg: { type: 'polynomial', line: { width: 3, color: 'blue' } },
+                    datasetCfg: {
+                        sections: [
+                            { calculation: { order: 2 }, line: { width: 1.5 } },
+                            { calculation: { order: 3 }, line: { color: 'orange', dash: [8, 2] } },
+                            { calculation: { order: 4 }, line: { color: 'red' } },
+                        ]
+                    }
+                },
+            ]
         },
         {
             title: 'Using predictions from other section',
             samples: [
-                {
-                    prediction: 'all',
-                    subtitle: 'Overwrites the last section\'s data',
-                    chartType: 'bar',
-                    // optionsCfg: {},
-                    datasetCfg: {
-                        type: ['linear', 'exponential', 'polynomial'],
-                        line: { color: 'blue', width: 3 },
-                        extendPredictions: true,
-                        sections: [
-                            { startIndex: 0, endIndex: this.NUM_ELEMS_2 },
-                            { startIndex: this.NUM_ELEMS_2, endIndex: this.NUM_NORMAL_ELEMS - 1, line: { color: 'orange' } },
-                            { type: 'copy', copySectionIndex: 1, copyOverData: 'all', startIndex: this.NUM_NORMAL_ELEMS - 1, endIndex: this.NUM_NORMAL_ELEMS + 9, line: { color: 'purple' } },
-                        ]
-                    }
-                },
                 {
                     prediction: 'none',
                     subtitle: 'Without overwriting the last section\'s data',
@@ -123,9 +120,25 @@ var demo = new function () {
                         line: { color: 'blue', width: 3 },
                         extendPredictions: true,
                         sections: [
-                            { startIndex: 0, endIndex: this.NUM_ELEMS_2 },
+                            { endIndex: this.NUM_ELEMS_2 },
                             { startIndex: this.NUM_ELEMS_2, endIndex: this.NUM_NORMAL_ELEMS - 1, line: { color: 'orange' } },
-                            { type: 'copy', copySectionIndex: 1, copyOverData: 'none', startIndex: this.NUM_NORMAL_ELEMS - 1, endIndex: this.NUM_NORMAL_ELEMS + 9, line: { color: 'purple' } },
+                            { type: 'copy', copySectionIndex: 1, copyOverData: 'none', startIndex: this.NUM_NORMAL_ELEMS - 1, endIndex: this.NUM_ELEMS_PREDICT - 1, line: { color: 'purple' } },
+                        ]
+                    }
+                },
+                {
+                    prediction: 'all',
+                    subtitle: 'Overwrites the last section\'s data',
+                    chartType: 'bar',
+                    // optionsCfg: {},
+                    datasetCfg: {
+                        type: ['linear', 'exponential', 'polynomial'],
+                        line: { color: 'blue', width: 3 },
+                        extendPredictions: true,
+                        sections: [
+                            { endIndex: this.NUM_ELEMS_2 },
+                            { startIndex: this.NUM_ELEMS_2, endIndex: this.NUM_NORMAL_ELEMS - 1, line: { color: 'orange' } },
+                            { type: 'copy', copySectionIndex: 1, copyOverData: 'all', startIndex: this.NUM_NORMAL_ELEMS - 1, endIndex: this.NUM_ELEMS_PREDICT - 1, line: { color: 'purple' } },
                         ]
                     }
                 },
@@ -139,9 +152,9 @@ var demo = new function () {
                         line: { color: 'blue', width: 3 },
                         extendPredictions: true,
                         sections: [
-                            { startIndex: 0, endIndex: this.NUM_ELEMS_2 },
+                            { endIndex: this.NUM_ELEMS_2 },
                             { startIndex: this.NUM_ELEMS_2, endIndex: this.NUM_NORMAL_ELEMS - 1, line: { color: 'orange' } },
-                            { type: 'copy', copySectionIndex: 1, copyOverData: 'last', startIndex: this.NUM_NORMAL_ELEMS - 1, endIndex: this.NUM_NORMAL_ELEMS + 9, line: { color: 'purple' } },
+                            { type: 'copy', copySectionIndex: 1, copyOverData: 'last', startIndex: this.NUM_NORMAL_ELEMS - 1, endIndex: this.NUM_ELEMS_PREDICT - 1, line: { color: 'purple' } },
                         ]
                     }
                 },
@@ -151,21 +164,21 @@ var demo = new function () {
             title: 'Configuration inheritance',
             samples: [
                 {
-                    subtitle: 'Inherits precision',
-                    optionsCfg: { precision: 5 },
+                    subtitle: 'Inherits calculation: precision',
+                    optionsCfg: { calculation: { precision: 5 } },
                     datasetCfg: { type: 'linear' }
                 },
                 {
-                    subtitle: 'Inherits all but sections in two datasets',
+                    subtitle: 'Inherits all in two different datasets',
                     numDatasets: 2,
                     chartType: 'line',
-                    optionsCfg: { type: 'linear', precision: 4 },
+                    optionsCfg: { type: 'linear', calculation: { precision: 4 } },
                     datasetCfg: {}
                 },
                 {
-                    subtitle: 'Inherits line and overrides type',
-                    optionsCfg: { type: 'linear', line: { width: 3, dash: [2, 2], color: '#f00' } },
-                    datasetCfg: { type: 'polynomial' }
+                    subtitle: 'Inherits line and polynomial order, but overrides type and precision',
+                    optionsCfg: { type: 'linear', line: { width: 3, dash: [2, 2], color: '#f00' }, calculation: { precision: 5, order: 4 } },
+                    datasetCfg: { type: 'polynomial', calculation: { precision: 3 } }
                 }
             ]
         },

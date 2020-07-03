@@ -1,8 +1,9 @@
 import { ChartDataSets } from 'chart.js';
 import { MetaSection } from './MetaSection';
+import * as regression from 'regression';
 
 export type Type = 'copy' | 'linear' | 'exponential' | 'power' | 'polynomial' | 'logarithmic';
-export type OverwritingType = 'no' | 'all' | 'empty' | 'last';
+export type OverwritingType = 'none' | 'all' | 'empty' | 'last';
 
 export interface LineOptions {
     width?: number;
@@ -10,15 +11,25 @@ export interface LineOptions {
     dash?: number[];
 }
 
+export type CalculationOptions = regression.Options;
+
 export interface BasicOptions {
     /** Type of regression to be calculated for all the sections unless they define their own type */
     type?: Type | Type[];
     /** Line configuration for all the sections unless they define their own line */
     line?: LineOptions;
-    /** Precision of the values returned by the regression calculations */
-    precision?: number;
+    /** Precision and polynomial order of the values returned by the regression calculations */
+    calculation?: CalculationOptions;
     /** Previous sections predictions for the current section will be drawed as dashed lines */
     extendPredictions?: boolean;
+    /** 
+     * If type=='copy' the dataset's data could be overwriten:
+     * none - No data will be overwriten (default)
+     * all  - All data will be overwriten.
+     * empty- Only zero, undefined, or null data will be overwriten.
+     * last - Only the last item (data[endIndex]) will be overwriten.
+     */
+    copyOverData?: OverwritingType;
 }
 
 export interface Section extends BasicOptions {
@@ -30,14 +41,6 @@ export interface Section extends BasicOptions {
      * the section with index copySectionIndex
      */
     copySectionIndex?: number;
-    /** 
-     * If type=='copy' the dataset's data should be overwriten?
-     * none - No data will be overwriten (default)
-     * all  - All data will be overwriten.
-     * empty- Only zero, undefined, or null data will be overwriten.
-     * last - Only the last item (data[endIndex]) will be overwriten.
-     */
-    copyOverData?: OverwritingType;
 }
 
 export interface ChartDataSetsEx extends ChartDataSets {

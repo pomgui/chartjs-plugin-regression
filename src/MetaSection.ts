@@ -1,12 +1,14 @@
 import * as regression from "regression";
-import { Section, Type, LineOptions, ChartDataSetsEx, BasicOptions, OverwritingType } from "./types";
+import { Section, Type, LineOptions, ChartDataSetsEx, BasicOptions, OverwritingType, CalculationOptions } from "./types";
 import { MetaDataSet } from "./MetaData";
-import { deepCopy } from "./tools";
 
 const
-    defaultOptions: BasicOptions = {
+    defaultConfig: BasicOptions = {
         type: "linear",
-        precision: 2,
+        calculation: {
+            precision: 2,
+            order: 2
+        },
         line: {
             width: 2,
             color: '#000',
@@ -28,46 +30,48 @@ export class MetaSection implements Section, BasicOptions {
     copySectionIndex?: number;
     result?: regression.Result;
     copyOverData?: OverwritingType;
-    private _regressionOptions: regression.Options;
+    calculation: CalculationOptions;
 
     constructor(sec: Section, private _meta: MetaDataSet) {
         const chart = _meta.chart;
         const ds = _meta.dataset;
         // Copying from user config
-        this.startIndex = sec.startIndex;
-        this.endIndex = sec.endIndex;
         this.copySectionIndex = sec.copySectionIndex;
-        this.copyOverData = sec.copyOverData;
-        // Calculate inherited configuration 
-        const globalOpts = getGlobalOptions();
-        const cfg = simpleMerge('type,precision,extendPredictions', defaultOptions, globalOpts, ds.regressions, sec);
-        this.line = simpleMerge('color,width,dash', defaultOptions.line, globalOpts.line, ds.regressions.line, sec.line);
+        // Calculate inherited configuration
+        const cfg = getConfig(['type', 'calculation', 'line', 'extendPredictions', 'copyOverData']);
+        this.startIndex = sec.startIndex || 0;
+        this.endIndex = sec.endIndex || ds.data!.length - 1;
         this.type = Array.isArray(cfg.type) ? cfg.type : [cfg.type];
-        this._regressionOptions = { precision: cfg.precision || 2 };
+        this.line = cfg.line;
+        this.calculation = cfg.calculation;
         this.extendPredictions = cfg.extendPredictions;
+        this.copyOverData = cfg.copyOverData;
         validate(this.type);
 
         // --- constructor helpers
 
-        function getGlobalOptions() {
+        function getConfig(fields: string[]): any {
             let o, p;
-            return (o = chart.config.options) && (p = o.plugins) && p.regressions || {};
+            const globalConfig = (o = chart.config.options) && (p = o.plugins) && p.regressions || {};
+            return configMerge(fields, defaultConfig, globalConfig, ds.regressions, sec);
+        }
+        function configMerge(fields: string[], ...cfgList: any[]): any {
+            const dstConfig: any = {};
+            fields.forEach(f => {
+                cfgList.forEach(srcConfig => {
+                    const o = srcConfig[f];
+                    const t = typeof o;
+                    if (t != 'undefined') {
+                        if (Array.isArray(o) || t != 'object' || o == null) dstConfig[f] = o;
+                        else dstConfig[f] = Object.assign({}, dstConfig[f], configMerge(Object.keys(o), o));
+                    }
+                });
+            });
+            return dstConfig;
         }
         function validate(type: Type[]) {
             if (type.length > 1 && type.includes('copy'))
                 throw Error('Invalid regression type:' + cfg.type + '. "none" cannot be combined with other type!');
-        }
-        function simpleMerge(fieldNames: string, ...objs: any[]): any {
-            const fields = fieldNames.split(',');
-            const ret: any = {};
-            for (const obj of objs) {
-                if (!obj) continue;
-                const o = deepCopy(obj, fields);
-                for (const f of fields) {
-                    if (typeof o[f] != 'undefined') ret[f] = o[f];
-                }
-            };
-            return ret;
         }
     }
 
@@ -75,7 +79,7 @@ export class MetaSection implements Section, BasicOptions {
         const sectionData = meta.points.slice(this.startIndex, this.endIndex + 1);
         if (this.type[0] != 'copy') {
             this.result = this.type.reduce((max: any, type) => {
-                const r: Result = (regression as any)[type](sectionData, this._regressionOptions);
+                const r: Result = (regression as any)[type](sectionData, this.calculation);
                 r.type = type;
                 return (!max || max.r2 < r.r2) ? r : max;
             }, null);
@@ -87,17 +91,18 @@ export class MetaSection implements Section, BasicOptions {
                 data = ds.data!;
             r.points = sectionData.map(p => r.predict(p[0])) as any;
             delete r.r2;
-            r.points.forEach(([index, value]) => {
-                if (
-                    (index < from.startIndex || index > from.endIndex) &&
-                    (
-                        overwrite == 'all' ||
-                        overwrite == 'last' && index == this.endIndex ||
-                        overwrite == 'empty' && !data[index]
+            if (overwrite != 'none')
+                r.points.forEach(([index, value]) => {
+                    if (
+                        (index < from.startIndex || index > from.endIndex) &&
+                        (
+                            overwrite == 'all' ||
+                            overwrite == 'last' && index == this.endIndex ||
+                            overwrite == 'empty' && !data[index]
+                        )
                     )
-                )
-                    data[index] = value;
-            });
+                        data[index] = value;
+                });
         }
     }
 

@@ -1,21 +1,31 @@
 # chartjs-plugin-regression
-Chart.js 2.9+ plugin to calculate and display regressions.
+Chart.js plugin to calculate and draw statistical linear, exponential, power, 
+logarithmic, and polynomial regressions using chart datasets data.
+
+The plugin, at the current version, uses the [regression](https://www.npmjs.com/package/regression)
+npm package as its calculation engine.
 
 ## Demo
-[Live Demo](https://pomgui.github.io/chartjs-plugin-regression/demo/)
+For a better understanding of the capabilities of this plugin, please see this 
+[Live Demo](https://pomgui.github.io/chartjs-plugin-regression/demo/).
 
 ## Download
-[Compress](https://pomgui.github.io/chartjs-plugin-regression/dist/chartjs-plugin-regression.js)
+The [compressed](https://pomgui.github.io/chartjs-plugin-regression/dist/chartjs-plugin-regression.js)
+version includes the regression package.
 
 ## Installation
 
-    npm install chartjs-plugin-regression
+    npm install --save chartjs-plugin-regression
 
 ## Usage
 JavaScript
 ```JavaScript
 new Chart(ctx, {
   type: type,
+  plugins: [
+    // This chart will use the plugin
+    ChartRegressions
+  ],
   data: {
     ...
     datasets: [
@@ -42,6 +52,7 @@ new Chart(ctx, {
   }
 });
 ```
+
 ## License
 The project is released under the [ISC license](https://github.com/pomgui/chartjs-plugin-regression/blob/master/LICENSE).
 
