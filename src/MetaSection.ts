@@ -1,5 +1,5 @@
 import * as regression from "regression";
-import { Section, Type, LineOptions, ChartDataSetsEx, BasicOptions, OverwritingType, CalculationOptions, CopyOptions } from "./types";
+import { Section, Type, LineOptions, ChartDataSetsEx, BasicOptions, OverwritingType, CalculationOptions, CopyOptions, CopyOptionsEx } from "./types";
 import { MetaDataSet } from "./MetaData";
 
 const
@@ -30,16 +30,14 @@ export class MetaSection implements Section, BasicOptions {
     endIndex: number;
     line: LineOptions;
     extendPredictions: boolean;
-    copySectionIndex?: number;
     result?: regression.Result;
-    copy: CopyOptions;
+    copy: CopyOptionsEx;
     calculation: CalculationOptions;
 
     constructor(sec: Section, private _meta: MetaDataSet) {
         const chart = _meta.chart;
         const ds = _meta.dataset;
         // Copying from user config
-        this.copySectionIndex = sec.copySectionIndex;
         // Calculate inherited configuration
         const cfg = getConfig(['type', 'calculation', 'line', 'extendPredictions', 'copy']);
         this.startIndex = sec.startIndex || 0;
@@ -86,9 +84,9 @@ export class MetaSection implements Section, BasicOptions {
                 r.type = type;
                 return (!max || max.r2 < r.r2) ? r : max;
             }, null);
-        } else if (this.copySectionIndex) {
+        } else if (this.copy.fromSectionIndex) {
             const
-                from = meta.sections[this.copySectionIndex],
+                from = meta.sections[this.copy.fromSectionIndex],
                 r = this.result = Object.assign({}, from.result),
                 overwrite = this.copy.overwriteData,
                 data = ds.data!;
@@ -105,7 +103,7 @@ export class MetaSection implements Section, BasicOptions {
                         )
                     ) {
                         if (this.copy.maxValue) value = Math.min(this.copy.maxValue, value);
-                        if (this.copy.minValue) value = Math.max(this.copy.minValue, value);
+                        if (typeof this.copy.minValue == 'number') value = Math.max(this.copy.minValue, value);
                         data[index] = value;
                     }
                 });

@@ -39,17 +39,18 @@ export interface BasicOptions {
     copy?: CopyOptions;
 }
 
+export interface CopyOptionsEx extends CopyOptions {
+    /** Copy the predictions calculated by the section with index fromSectionIndex */
+    fromSectionIndex?: number;
+}
+
 export interface Section extends BasicOptions {
     /** Start index on dataset's data. Default: 0 */
     startIndex?: number;
     /** End index on dataset's data. Default: data.length-1 */
     endIndex?: number;
-    /**
-     * If type=='copy' no regression will be calculated, but the data will 
-     * be filled from the predictions calculated by the regression in 
-     * the section with index copySectionIndex
-     */
-    copySectionIndex?: number;
+    /** If type=='copy' the section can be configured with this extended options for copy */
+    copy?: CopyOptionsEx;
 }
 
 export interface ChartDataSetsEx extends ChartDataSets {

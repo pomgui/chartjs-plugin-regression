@@ -45,6 +45,21 @@ class Plugin implements PluginServiceGlobalRegistration, PluginServiceRegistrati
         forEach(chart, (ds, meta) => meta.adjustScales());
     }
 
+    /** Draws the vertical lines before the datasets are drawn */
+    beforeDatasetsDraw(chart: Chart, easing: Easing, options?: any): void {
+        forEach(chart, (ds, meta) => {
+            const ctx = chart.ctx!;
+            ctx.save();
+            try {
+                for (let i = 0; i < meta.sections.length - 1; i++)
+                    meta.sections[i].drawVerticalLine(ctx);
+            } finally {
+                ctx.restore();
+            };
+        });
+    }
+
+    /** Draws the regression lines */
     afterDatasetsDraw(chart: Chart, easing: Easing, options?: any): void {
         forEach(chart, (ds, meta) => meta.draw());
     }

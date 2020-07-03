@@ -122,7 +122,7 @@ var demo = new function () {
                         sections: [
                             { endIndex: this.NUM_ELEMS_2 },
                             { startIndex: this.NUM_ELEMS_2, endIndex: this.NUM_NORMAL_ELEMS - 1, line: { color: 'orange' } },
-                            { type: 'copy', copySectionIndex: 1, copyOverData: 'none', startIndex: this.NUM_NORMAL_ELEMS - 1, endIndex: this.NUM_ELEMS_PREDICT - 1, line: { color: 'purple' } },
+                            { type: 'copy', copy: { fromSectionIndex: 1, overwriteData: 'none' }, startIndex: this.NUM_NORMAL_ELEMS - 1, line: { color: 'purple' } },
                         ]
                     }
                 },
@@ -138,7 +138,7 @@ var demo = new function () {
                         sections: [
                             { endIndex: this.NUM_ELEMS_2 },
                             { startIndex: this.NUM_ELEMS_2, endIndex: this.NUM_NORMAL_ELEMS - 1, line: { color: 'orange' } },
-                            { type: 'copy', copySectionIndex: 1, copyOverData: 'all', startIndex: this.NUM_NORMAL_ELEMS - 1, endIndex: this.NUM_ELEMS_PREDICT - 1, line: { color: 'purple' } },
+                            { type: 'copy', copy: { fromSectionIndex: 1, overwriteData: 'all' }, startIndex: this.NUM_NORMAL_ELEMS - 1, line: { color: 'purple' } },
                         ]
                     }
                 },
@@ -154,7 +154,7 @@ var demo = new function () {
                         sections: [
                             { endIndex: this.NUM_ELEMS_2 },
                             { startIndex: this.NUM_ELEMS_2, endIndex: this.NUM_NORMAL_ELEMS - 1, line: { color: 'orange' } },
-                            { type: 'copy', copySectionIndex: 1, copyOverData: 'last', startIndex: this.NUM_NORMAL_ELEMS - 1, endIndex: this.NUM_ELEMS_PREDICT - 1, line: { color: 'purple' } },
+                            { type: 'copy', copy: { fromSectionIndex: 1, overwriteData: 'last' }, startIndex: this.NUM_NORMAL_ELEMS - 1, line: { color: 'purple' } },
                         ]
                     }
                 },

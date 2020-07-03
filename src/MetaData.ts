@@ -56,8 +56,8 @@ export class MetaDataSet {
             for (let i = 0; i < this.sections.length; i++) {
                 const section = this.sections[i];
                 section.drawRegression(ctx);
-                if (i < this.sections.length - 1)
-                    section.drawVerticalLine(ctx);
+                // if (i < this.sections.length - 1)
+                //     section.drawVerticalLine(ctx);
             }
         } finally {
             ctx.restore();
@@ -75,7 +75,7 @@ export class MetaDataSet {
                 for (let r = 0; r < i; r++) {
                     ctx.beginPath();
                     _setLineAttrs(me.sections[r].line!);
-                    ctx.lineWidth = 1; // overrides the width to a thin line
+                    // ctx.lineWidth = 1; // overrides the width to a thin line
                     const fn = me.sections[r].result!.predict;
                     const calcXY = (index: number) => me.getXY(index, fn(index)[1]);
                     let p = calcXY(section.startIndex);
