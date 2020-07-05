@@ -13,7 +13,7 @@ For a better understanding of the capabilities of this plugin, please see this
 [Live Demo](https://pomgui.github.io/chartjs-plugin-regression/demo/).
 
 ## Download
-The [compressed](https://pomgui.github.io/chartjs-plugin-regression/dist/chartjs-plugin-regression-0.1.0.js)
+The [compressed](https://pomgui.github.io/chartjs-plugin-regression/dist/chartjs-plugin-regression-0.1.1.js)
 version includes the regression package.
 
 ## Installation

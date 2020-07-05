@@ -1,6 +1,6 @@
 {
   "name": "chartjs-plugin-regression",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Plugin to draw a regression line",
   "main": "lib/index.js",
   "scripts": {
@@ -18,7 +18,12 @@
     "url": "git+https://github.com/pomgui/chartjs-plugin-regression.git"
   },
   "keywords": [
-    "charts", "chartjs", "regression", "data", "fiting", "analysis"
+    "charts",
+    "chartjs",
+    "regression",
+    "data",
+    "fiting",
+    "analysis"
   ],
   "bugs": {
     "url": "https://github.com/pomgui/chartjs-plugin-regression/issues"
