@@ -9,7 +9,7 @@
     "lint": "tslint -p tsconfig.json",
     "test": "echo \"Warning: no test specified\"",
     "preversion": "npm test",
-    "version": "node bin/setversion.js && npm run prepare && git add -A dist",
+    "version": "node bin/setversion.js && npm run prepare && git add -A",
     "postversion": "git push && git push --tags",
     "prepare": "rm dist/*; tsc && webpack --mode production"
   },
