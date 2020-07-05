@@ -9,9 +9,9 @@
     "lint": "tslint -p tsconfig.json",
     "test": "echo \"Warning: no test specified\"",
     "preversion": "npm test",
-    "version": "node bin/setversion.js && npm run prepublish && git -A dist lib",
+    "version": "node bin/setversion.js && npm run prepare && git add -A dist",
     "postversion": "git push && git push --tags",
-    "prepublish": "rm dist/*; tsc && webpack --mode production"
+    "prepare": "rm dist/*; tsc && webpack --mode production"
   },
   "repository": {
     "type": "git",
