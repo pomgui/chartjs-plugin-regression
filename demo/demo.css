@@ -2,12 +2,20 @@ body * {
     box-sizing: border-box;
 }
 
-h1,h2,h3{
+h1,
+h2,
+h3 {
     margin-bottom: 0;
 }
 
-.sample {
+.sample>.row {
     height: 300px;
+}
+
+.row::after {
+    content: '';
+    display: table;
+    clear  : both;
 }
 
 .cntr {

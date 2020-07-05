@@ -52,7 +52,7 @@ class Plugin implements PluginServiceGlobalRegistration, PluginServiceRegistrati
             ctx.save();
             try {
                 for (let i = 0; i < meta.sections.length - 1; i++)
-                    meta.sections[i].drawVerticalLine(ctx);
+                    meta.sections[i].drawRightBorder(ctx);
             } finally {
                 ctx.restore();
             };

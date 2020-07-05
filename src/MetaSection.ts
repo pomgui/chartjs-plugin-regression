@@ -33,12 +33,11 @@ export class MetaSection implements Section, BasicOptions {
     result?: regression.Result;
     copy: CopyOptionsEx;
     calculation: CalculationOptions;
+    label: string;
 
     constructor(sec: Section, private _meta: MetaDataSet) {
         const chart = _meta.chart;
         const ds = _meta.dataset;
-        // Copying from user config
-        // Calculate inherited configuration
         const cfg = getConfig(['type', 'calculation', 'line', 'extendPredictions', 'copy']);
         this.startIndex = sec.startIndex || 0;
         this.endIndex = sec.endIndex || ds.data!.length - 1;
@@ -47,37 +46,48 @@ export class MetaSection implements Section, BasicOptions {
         this.calculation = cfg.calculation;
         this.extendPredictions = cfg.extendPredictions;
         this.copy = cfg.copy;
-        validate(this.type);
+        this.label = sec.label || this._meta.chart.data.labels![this.endIndex] as string;
+        this._validateType();
 
         // --- constructor helpers
 
+        /**
+         * Calculate the inherited configuration from defaultConfig, globalConfig, 
+         * dataset config, and section config (in that order)
+         */
         function getConfig(fields: string[]): any {
             let o, p;
             const globalConfig = (o = chart.config.options) && (p = o.plugins) && p.regressions || {};
             return configMerge(fields, defaultConfig, globalConfig, ds.regressions, sec);
-        }
-        function configMerge(fields: string[], ...cfgList: any[]): any {
-            const dstConfig: any = {};
-            fields.forEach(f => {
-                cfgList.forEach(srcConfig => {
-                    const o = srcConfig[f];
-                    const t = typeof o;
-                    if (t != 'undefined') {
-                        if (Array.isArray(o) || t != 'object' || o == null) dstConfig[f] = o;
-                        else dstConfig[f] = Object.assign({}, dstConfig[f], configMerge(Object.keys(o), o));
-                    }
+
+            /** merge the config objects */
+            function configMerge(fields: string[], ...cfgList: any[]): any {
+                const dstConfig: any = {};
+                fields.forEach(f => {
+                    cfgList.forEach(srcConfig => {
+                        const o = srcConfig[f];
+                        const t = typeof o;
+                        if (t != 'undefined') {
+                            if (Array.isArray(o) || t != 'object' || o == null) dstConfig[f] = o;
+                            else dstConfig[f] = Object.assign({}, dstConfig[f], configMerge(Object.keys(o), o));
+                        }
+                    });
                 });
-            });
-            return dstConfig;
+                return dstConfig;
+            }
         }
-        function validate(type: Type[]) {
-            if (type.length > 1 && type.includes('copy'))
-                throw Error('Invalid regression type:' + cfg.type + '. "none" cannot be combined with other type!');
-        }
+
+    }
+    /** Validates the type to avoid inconsistences */
+    _validateType() {
+        if (this.type.length > 1 && this.type.includes('copy'))
+            throw Error('Invalid regression type:' + this.type + '. "none" cannot be combined with other type!');
     }
 
+    /** Calculates the regression(s) and sets the result objects */
     calculate(ds: ChartDataSetsEx, meta: MetaDataSet) {
-        const sectionData = meta.points.slice(this.startIndex, this.endIndex + 1);
+        const sectionData = (ds.data as number[]).slice(this.startIndex, this.endIndex + 1)
+            .map((v, i) => [i + this.startIndex, v]);
         if (this.type[0] != 'copy') {
             this.result = this.type.reduce((max: any, type) => {
                 const r: Result = (regression as any)[type](sectionData, this.calculation);
@@ -110,7 +120,7 @@ export class MetaSection implements Section, BasicOptions {
         }
     }
 
-    drawVerticalLine(ctx: CanvasRenderingContext2D): void {
+    drawRightBorder(ctx: CanvasRenderingContext2D): void {
         ctx.beginPath();
         this._setLineAttrs(ctx);
         ctx.setLineDash([10, 2]);
@@ -119,22 +129,32 @@ export class MetaSection implements Section, BasicOptions {
         const p = this._meta.getXY(this.endIndex, 0);
         ctx.moveTo(p.x, this._meta.topY!);
         ctx.lineTo(p.x, this._meta.bottomY!);
-        // ctx.fillText(xScale.getLabelForIndex(this.end), p.x, yScale.top);
-        ctx.fillText(this._meta.chart.data.labels![this.endIndex] as string, p.x, this._meta.topY!);
+        ctx.fillStyle = this.line.color!;
+        ctx.fillText(this.label, p.x, this._meta.topY!);
         ctx.stroke();
     }
 
-    drawRegression(ctx: CanvasRenderingContext2D): void {
+    drawRegressions(ctx: CanvasRenderingContext2D): void {
+        for (let i = 0, len = this._meta.sections.length; i < len; i++) {
+            const section = this._meta.sections[i];
+            const isMe = section == this;
+            if (isMe && this.type[0] != 'copy' || !isMe && this.extendPredictions) {
+                section.drawRange(ctx, this.startIndex, this.endIndex, !isMe);
+            }
+            if (isMe) break;
+        }
+    }
+
+    drawRange(ctx: CanvasRenderingContext2D, startIndex: number, endIndex: number, forceDash: boolean): void {
         ctx.beginPath();
         this._setLineAttrs(ctx);
-        const points = this.result!.points;
-        if (!points.length) return;
-        let p = this._meta.getXY(this.startIndex, points[0][1]);
+        if (forceDash) ctx.setLineDash([5, 5]);
+        const predict = this.result!.predict;
+        const f = (x: number) => this._meta.getXY(x, predict(x)[1]);
+        let p = f(startIndex);
         ctx.moveTo(p.x, p.y);
-        for (let k = 1, j = this.startIndex + 1; j <= this.endIndex; j++, k++) {
-            // const y = this.result!.predict(j)[1];
-            const y = (k < points.length ? points[k] : this.result!.predict(j))[1];
-            p = this._meta.getXY(j, y);
+        for (let x = startIndex + 1; x <= endIndex; x++) {
+            p = f(x);
             ctx.lineTo(p.x, p.y);
         }
         ctx.stroke();

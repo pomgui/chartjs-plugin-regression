@@ -111,9 +111,11 @@ function piChart_LinkFn($scope, element) {
         for (var i = 0; i < ($scope.sample.numDatasets || 1); i++) {
             var sections = ChartRegressions.getSections(chart2, i);
             sections.forEach(function (s) {
-                s = Object.assign({ line: s.line }, s.result);
-                s.r2 = !s.r2 ? 'n/a' : (Math.round(s.r2 * 1000) / 10) + '%';
-                results.push(s);
+                if (s.result.r2) {
+                    s = Object.assign({ line: s.line }, s.result);
+                    s.r2 = (Math.round(s.r2 * 1000) / 10) + '%';
+                    results.push(s);
+                }
             });
         }
         $scope.results = results;

@@ -51,6 +51,8 @@ export interface Section extends BasicOptions {
     endIndex?: number;
     /** If type=='copy' the section can be configured with this extended options for copy */
     copy?: CopyOptionsEx;
+    /** Label that will be drawn in the top of the right border line. Default: xaxis' label */
+    label?: string;
 }
 
 export interface ChartDataSetsEx extends ChartDataSets {

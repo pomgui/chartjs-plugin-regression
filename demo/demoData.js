@@ -75,6 +75,20 @@ var demo = new function () {
                         ]
                     }
                 },
+                {
+                    subtitle: 'Multiple sections with custom label on right border',
+                    optionsCfg: {
+                        line: { color: 'blue', width: 3 },
+                    },
+                    datasetCfg: {
+                        type: ['linear', 'exponential', 'polynomial'],
+                        extendPredictions: true,
+                        sections: [
+                            { endIndex: this.NUM_ELEMS_2, line: { color: 'red' }, label: 'custom text' },
+                            { startIndex: this.NUM_ELEMS_2, endIndex: this.NUM_NORMAL_ELEMS - 1 }
+                        ]
+                    }
+                },
             ]
         },
         {
@@ -108,7 +122,7 @@ var demo = new function () {
             ]
         },
         {
-            title: 'Using predictions from other section',
+            title: 'Drawing predictions using other section\'s regression',
             samples: [
                 {
                     prediction: 'none',
@@ -121,8 +135,8 @@ var demo = new function () {
                         extendPredictions: true,
                         sections: [
                             { endIndex: this.NUM_ELEMS_2 },
-                            { startIndex: this.NUM_ELEMS_2, endIndex: this.NUM_NORMAL_ELEMS - 1, line: { color: 'orange' } },
-                            { type: 'copy', copy: { fromSectionIndex: 1, overwriteData: 'none' }, startIndex: this.NUM_NORMAL_ELEMS - 1, line: { color: 'purple' } },
+                            { startIndex: this.NUM_ELEMS_2, endIndex: this.NUM_NORMAL_ELEMS - 1, line: { color: 'red' } },
+                            { type: 'copy', copy: { fromSectionIndex: 1, overwriteData: 'none' }, startIndex: this.NUM_NORMAL_ELEMS - 1 },
                         ]
                     }
                 },
@@ -137,8 +151,8 @@ var demo = new function () {
                         extendPredictions: true,
                         sections: [
                             { endIndex: this.NUM_ELEMS_2 },
-                            { startIndex: this.NUM_ELEMS_2, endIndex: this.NUM_NORMAL_ELEMS - 1, line: { color: 'orange' } },
-                            { type: 'copy', copy: { fromSectionIndex: 1, overwriteData: 'all' }, startIndex: this.NUM_NORMAL_ELEMS - 1, line: { color: 'purple' } },
+                            { startIndex: this.NUM_ELEMS_2, endIndex: this.NUM_NORMAL_ELEMS - 1, line: { color: 'red' } },
+                            { type: 'copy', copy: { fromSectionIndex: 1, overwriteData: 'all' }, startIndex: this.NUM_NORMAL_ELEMS - 1 },
                         ]
                     }
                 },
@@ -153,8 +167,8 @@ var demo = new function () {
                         extendPredictions: true,
                         sections: [
                             { endIndex: this.NUM_ELEMS_2 },
-                            { startIndex: this.NUM_ELEMS_2, endIndex: this.NUM_NORMAL_ELEMS - 1, line: { color: 'orange' } },
-                            { type: 'copy', copy: { fromSectionIndex: 1, overwriteData: 'last' }, startIndex: this.NUM_NORMAL_ELEMS - 1, line: { color: 'purple' } },
+                            { startIndex: this.NUM_ELEMS_2, endIndex: this.NUM_NORMAL_ELEMS - 1, line: { color: 'red' } },
+                            { type: 'copy', copy: { fromSectionIndex: 1, overwriteData: 'last' }, startIndex: this.NUM_NORMAL_ELEMS - 1 },
                         ]
                     }
                 },

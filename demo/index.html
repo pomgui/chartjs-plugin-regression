@@ -10,7 +10,7 @@
     <script
         src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.js"></script>
     <script type="text/javascript"
-        src="../dist/chartjs-plugin-regression.js"></script>
+        src="../dist/chartjs-plugin-regression-0.0.3.js"></script>
     <script type="text/javascript" src="./demoData.js"></script>
     <script type="text/javascript" src="./demoHelpers.js"></script>
     <script type="text/javascript" src="./demo.js"></script>
@@ -22,21 +22,23 @@
             <h1 ng-bind="group.title"></h1>
             <div class="sample" ng-repeat="sample in group.samples">
                 <h2 ng-bind="sample.subtitle"></h2>
-                <div class="chart cntr">
-                    <pi-chart sample="sample">
-                    </pi-chart>
-                </div>
-                <div class="params cntr">
-                    <div>
-                        <div ng-if="sample.optionsCfg">
-                            <h3>Global Options Config</h3>
-                            <pre
-                                ng-bind="$ctrl.format(sample.optionsCfg)"></pre>
-                        </div>
-                        <div ng-if="sample.datasetCfg">
-                            <h3>Dataset Config</h3>
-                            <pre
-                                ng-bind="$ctrl.format(sample.datasetCfg)"></pre>
+                <div class="row">
+                    <div class="chart cntr">
+                        <pi-chart sample="sample">
+                        </pi-chart>
+                    </div>
+                    <div class="params cntr">
+                        <div>
+                            <div ng-if="sample.optionsCfg">
+                                <h3>Global Options Config</h3>
+                                <pre
+                                    ng-bind="$ctrl.format(sample.optionsCfg)"></pre>
+                            </div>
+                            <div ng-if="sample.datasetCfg">
+                                <h3>Dataset Config</h3>
+                                <pre
+                                    ng-bind="$ctrl.format(sample.datasetCfg)"></pre>
+                            </div>
                         </div>
                     </div>
                 </div>

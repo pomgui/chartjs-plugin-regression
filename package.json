@@ -4,10 +4,14 @@
   "description": "Plugin to draw a regression line",
   "main": "lib/index.js",
   "scripts": {
-    "build": "tsc && webpack",
+    "build": "tsc && webpack --mode development",
     "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
     "lint": "tslint -p tsconfig.json",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Warning: no test specified\"",
+    "preversion": "npm test",
+    "version": "node bin/setversion.js && npm run prepublish && git -A dist lib",
+    "postversion": "git push && git push --tags",
+    "prepublish": "rm dist/*; tsc && webpack --mode production"
   },
   "repository": {
     "type": "git",
@@ -27,6 +31,7 @@
     "@types/chart.js": "^2.9.22",
     "@types/regression": "^2.0.0",
     "prettier": "^2.0.5",
+    "source-map-loader": "^1.0.1",
     "tslint": "^6.1.2",
     "tslint-config-prettier": "^1.18.0",
     "typescript": "^3.9.5"

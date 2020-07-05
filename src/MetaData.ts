@@ -1,5 +1,5 @@
 import { Options, DataPoint } from 'regression';
-import { Section, LineOptions, ChartDataSetsEx } from './types';
+import { Section, LineOptions, ChartDataSetsEx, DatasetConfig } from './types';
 import { Point } from 'chart.js';
 import { MetaSection } from './MetaSection';
 
@@ -8,7 +8,6 @@ type GetXY = (index: number, y: number) => Point;
 export class MetaDataSet {
     chart: Chart;
     dataset: ChartDataSetsEx;
-    points: DataPoint[];
 
     /** Sections */
     sections: MetaSection[];
@@ -20,14 +19,21 @@ export class MetaDataSet {
 
     constructor(chart: Chart, ds: ChartDataSetsEx) {
         const cfg = ds.regressions;
-        const me = this;
         this.chart = chart;
         this.dataset = ds;
-        this.sections = (cfg.sections || [{ startIndex: 0, endIndex: ds.data!.length - 1 }])
-            .map((s: Section) => new MetaSection(s, this));
-        this.points = (ds.data! as number[]).map((v, i) => [i, !i ? null : !v ? null : v]) as DataPoint[];
+        this.sections = this._createMetaSections(cfg);
+        this._calculate();
+    }
 
-        me.sections.forEach(section => section.calculate(ds, this));  // Calculate Section Results
+    /** @private */
+    _createMetaSections(cfg: DatasetConfig): MetaSection[] {
+        const source = cfg.sections || [{ startIndex: 0, endIndex: this.dataset.data!.length - 1 }];
+        return source.map((s: Section) => new MetaSection(s, this));
+    }
+
+    /** @private */
+    _calculate() {
+        this.sections.forEach(section => section.calculate(this.dataset, this));  // Calculate Section Results
     }
 
     adjustScales() {
@@ -48,52 +54,11 @@ export class MetaDataSet {
 
     draw() {
         const ctx: CanvasRenderingContext2D = (this.chart as any).chart.ctx;
-        const me = this;
         ctx.save();
         try {
-            if (this.dataset.regressions.extendPredictions)
-                _drawPredictions();
-            for (let i = 0; i < this.sections.length; i++) {
-                const section = this.sections[i];
-                section.drawRegression(ctx);
-                // if (i < this.sections.length - 1)
-                //     section.drawVerticalLine(ctx);
-            }
+            this.sections.forEach(section => section.drawRegressions(ctx));
         } finally {
             ctx.restore();
-        }
-        return;
-
-
-        /**
-         * Draws the previous sections predictions as a dashed thin line
-         */
-        function _drawPredictions() {
-            ctx.setLineDash([5, 5]);
-            for (let i = 1; i < me.sections.length; i++) {
-                const section = me.sections[i];
-                for (let r = 0; r < i; r++) {
-                    ctx.beginPath();
-                    _setLineAttrs(me.sections[r].line!);
-                    // ctx.lineWidth = 1; // overrides the width to a thin line
-                    const fn = me.sections[r].result!.predict;
-                    const calcXY = (index: number) => me.getXY(index, fn(index)[1]);
-                    let p = calcXY(section.startIndex);
-                    ctx.moveTo(p.x, p.y);
-                    for (let j = section.startIndex + 1; j < section.endIndex + 1; j++) {
-                        p = calcXY(j);
-                        ctx.lineTo(p.x, p.y);
-                    }
-                    ctx.stroke();
-                }
-            }
-        }
-
-        function _setLineAttrs(line: LineOptions) {
-            if (line.width)
-                ctx.lineWidth = line.width;
-            if (line.color)
-                ctx.strokeStyle = line.color;
         }
     }
 }
