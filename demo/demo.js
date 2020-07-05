@@ -96,7 +96,6 @@ function piChart_LinkFn($scope, element) {
                 backgroundColor:
                     !isBarChart ? helpers.color(color, .5) :
                         helpers.generateColors(numElems, color, .5),
-                // fill: isBarChart,
                 showLine: isBarChart,
                 // Configuration of the plugin for the dataset:
                 regressions: datasetCfg

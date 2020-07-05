@@ -18,8 +18,7 @@
     "url": "git+https://github.com/pomgui/chartjs-plugin-regression.git"
   },
   "keywords": [
-    "chart",
-    "regression"
+    "charts", "chartjs", "regression", "data", "fiting", "analysis"
   ],
   "bugs": {
     "url": "https://github.com/pomgui/chartjs-plugin-regression/issues"

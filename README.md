@@ -5,7 +5,8 @@ logarithmic, and polynomial regressions using chart datasets data.
 The plugin, at the current version, uses the [regression](https://www.npmjs.com/package/regression)
 npm package as its calculation engine.
 
-Also, it's restricted to bar and line chart types.
+### Important
+It's restricted to bar and line chart types.
 
 ## Demo
 For a better understanding of the capabilities of this plugin, please see this 
