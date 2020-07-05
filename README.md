@@ -5,6 +5,8 @@ logarithmic, and polynomial regressions using chart datasets data.
 The plugin, at the current version, uses the [regression](https://www.npmjs.com/package/regression)
 npm package as its calculation engine.
 
+Also, it's restricted to bar and line chart types.
+
 ## Demo
 For a better understanding of the capabilities of this plugin, please see this 
 [Live Demo](https://pomgui.github.io/chartjs-plugin-regression/demo/).
@@ -18,10 +20,12 @@ version includes the regression package.
     npm install --save chartjs-plugin-regression
 
 ## Usage
-JavaScript
+
+For a single chart, it needs to be listed in plugins section (see below).
+
 ```JavaScript
 new Chart(ctx, {
-  type: type,
+  type: 'bar',
   plugins: [
     // This chart will use the plugin
     ChartRegressions
@@ -38,19 +42,199 @@ new Chart(ctx, {
           ...
         }
       }
-    ] 
-  },
-  options: {
-    plugins: {
-      regressions: {
-        // Global configuration of the plugin, these values will be used unless each dataset defines their own
-        type, line, calculation, extendPredictions, copyOverData,
-        // Callback function to know when the calculation have been completed for all the datasets.
-        onCompleteCalculation: (chart)=> ...
-      }
-    }
+    ]
+    ...
   }
 });
+```
+
+Also, it's possible to register the plugin for all the charts:
+
+```Javascript
+Chart.plugins.register(ChartRegressions);
+```
+
+### Configuration
+
+The plugin has three levels of configuration:
+
+- global (for all the datasets in a chart)
+- Per dataset
+- Per section
+
+There are common properties that the three levels share, and the priority of them are: section, dataset, and global.
+
+#### Common properties
+
+Common to the three levels of configuration.
+
+| Property | Description |
+|---|---|
+| type | Type of regression to be calculated. It can be 'copy', 'linear', 'exponential', 'power', 'polynomial', or 'logarithmic'. Or an array with a combination of them, in which case the regression type with the best [_R²_](https://en.wikipedia.org/wiki/Coefficient_of_determination) will be drawn. |
+| line | Line configuration for drawing the regression. It has the following properties: `{width, color, dash}` |
+| calculation | Precision and polynomial order of the values returned by the regression calculations |
+| extendPredictions | Previous sections predictions for the current section will be drawed as dashed lines |
+| copy | Only if type=='copy'. Behavior of sections that copy other section's calculation |
+
+Some considerations:
+
+- `calculation` has the following properties:
+
+| Property | Description |
+|---|---|
+| `precision` | how many decimals will have the results? (default: 2) |
+| `order` | Only for polynomial regressions. Example: _ax² + bx + c_ has order 2. |
+
+
+- `copy` has the following properties:
+
+| Property | Description |
+|---|---|
+| `overwriteData` | can be 'none', 'all', 'empty', or 'last'. Default: 'none'. It determines how the dataset's data will be overwritten in this section (empty: Only zero, undefined, or null data will be overwriten). |
+| `minValue` | Minimum value that the predicted value can be written into the data. |
+| `maxValue` | Maximum value that the predicted value can be written into the data. |
+
+#### Global
+
+The global configuration affects all the regressions calculated for all the datasets in the chart. It contains all the common properties and the following properties:
+
+| Property | Description |
+|---|---|
+| onCompleteCalculation | Callback called when the regressions for all the datasets in a chart have been calculated |
+
+Example:
+
+```javascript
+options: {
+  plugins: {
+    regressions: {
+      type: ['linear', 'polynomial'],
+      line: { color: 'blue', width: 3 },
+      onCompleteCalculation: function callback(chart){ ... }
+    }
+  }
+}
+```
+
+#### Per Dataset
+
+It's possible to configure the regressions per dataset. The configuration will contain all the common properties and the following properties:
+
+| Property | Description |
+|---|---|
+| sections | Array of sections of the data that shall be drawn. If not specified it's assumed `[{start:0,end:data.length-1}]` |
+
+Example:
+
+```javascript
+datasets: [
+  {
+    ...
+    // Configuration of the plugin per dataset (only will be drawn the datasets with this property) 
+    regressions: {
+      type: ['linear','exponential'],
+      line: { color: '#ff0', width: 3},
+      calculation: { precision: 5 },
+      sections: [{startIndex: 10, endIndex: 50}],
+      ...
+    }
+  }
+]
+```
+
+#### Per Section
+
+Each section can be configured independently using all the common properties and the following properties:
+
+| Property | Description |
+|---|---|
+| startIndex | Start index on dataset's data. Default: 0 |
+| endIndex | End index on dataset's data. Default: data.length-1 |
+| label | Label that will be drawn in the top of the right border line. Default: xaxis' label |  
+| copy.fromSectionIndex | Copy the predictions calculated by other section (the one with index fromSectionIndex) |
+
+Example:
+
+```javascript
+datasets: [
+  {
+    ...
+    // Configuration of the plugin per dataset (only will be drawn the datasets with this property) 
+    regressions: {
+      line: { width: 3 },
+      calculation: { precision: 5 },
+      sections: [
+        {
+          type: ['linear','exponential'],
+          line: { color: 'red' },
+          startIndex: 10, 
+          endIndex: 50
+        },
+        {
+          type: 'polynomial',
+          line: { color: 'green' },
+          startIndex: 50, 
+          endIndex: 80,
+          calculation: { order: 4 }
+        },
+      ]
+    }
+  }
+  ...
+]
+```
+
+### API
+
+#### .getDataset(chart, datasetIndex)
+
+Returns the metadata associated to one dataset used internally by the plugin to work.
+
+```javascript
+var meta = ChartRegressions.getDataset(chart, datasetIndex);
+```
+
+This object provides the following information:
+
+| Property | Description |
+|---|---|
+| `sections` | array of sections for each dataset (it will contain at least 1 section) |
+| `getXY(tickIndex, y)` | Returns the canvas coordinates {x,y} for a value `y` over a tick. |
+| `topY` | Minimum y coordinate in the canvas. |
+| `bottomY` | Maximum y coordinate in the canvas. |
+
+#### .getSections(chart, datasetIndex)
+
+Returns the sections with all the properties calculated (some with default values, or inherited from dataset's plugin configuration or the global configuration in options).
+
+This object provides the following information:
+
+| Property | Description |
+|---|---|
+| `type` | array of regression types used to calculate and draw the section. |
+| `startIndex` | Index of the dataset's data. |
+| `endIndex` | Index of the dataset's data. |
+| `line` | Configuration used to draw the lines {color, width, dash}. |
+| `result` | Regression calculation result (see [demo](https://pomgui.github.io/chartjs-plugin-regression/demo/)) to see how to use this information. |
+
+### Events
+
+#### onCompleteCalculation(chart)
+
+The plugin provides one single event to inform when the calculation of all the regresions for a chart have been conmpleted. 
+
+This callback should be configured in the chart options.
+
+Example:
+
+```javascript
+options: {
+  plugins: {
+    regressions: {
+      onCompleteCalculation: function callback(chart){ ... }
+    }
+  }
+}
 ```
 
 ## License

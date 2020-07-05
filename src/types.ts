@@ -35,7 +35,7 @@ export interface BasicOptions {
     calculation?: CalculationOptions;
     /** Previous sections predictions for the current section will be drawed as dashed lines */
     extendPredictions?: boolean;
-    /** * Only if type=='copy' */
+    /** Only if type=='copy' */
     copy?: CopyOptions;
 }
 
@@ -60,7 +60,7 @@ export interface ChartDataSetsEx extends ChartDataSets {
 }
 
 export interface DatasetConfig extends BasicOptions {
-    /** Sections (index) of the data that shall draw a regression. If not specified it's assumed {start:0,end:data.length-1} */
+    /** Sections of the data that shall draw a regression. If not specified it's assumed {start:0,end:data.length-1} */
     sections?: Section[];
 }
 
