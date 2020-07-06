@@ -1,1 +1,884 @@
-!function(t){var e={};function n(r){if(e[r])return e[r].exports;var i=e[r]={i:r,l:!1,exports:{}};return t[r].call(i.exports,i,i.exports,n),i.l=!0,i.exports}n.m=t,n.c=e,n.d=function(t,e,r){n.o(t,e)||Object.defineProperty(t,e,{enumerable:!0,get:r})},n.r=function(t){"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(t,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(t,"__esModule",{value:!0})},n.t=function(t,e){if(1&e&&(t=n(t)),8&e)return t;if(4&e&&"object"==typeof t&&t&&t.__esModule)return t;var r=Object.create(null);if(n.r(r),Object.defineProperty(r,"default",{enumerable:!0,value:t}),2&e&&"string"!=typeof t)for(var i in t)n.d(r,i,function(e){return t[e]}.bind(null,i));return r},n.n=function(t){var e=t&&t.__esModule?function(){return t.default}:function(){return t};return n.d(e,"a",e),e},n.o=function(t,e){return Object.prototype.hasOwnProperty.call(t,e)},n.p="",n(n.s=2)}([function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.MetaDataSet=void 0;var r=n(1),i=function(){function t(t,e){this.getXY=void 0;var n=e.regressions;this.chart=t,this.dataset=e,this.sections=this._createMetaSections(n),this._calculate()}return t.prototype._createMetaSections=function(t){var e=this;return(t.sections||[{startIndex:0,endIndex:this.dataset.data.length-1}]).map((function(t){return new r.MetaSection(t,e)}))},t.prototype._calculate=function(){var t=this;this.sections.forEach((function(e){return e.calculate(t.dataset,t)}))},t.prototype.adjustScales=function(){if(void 0===this.topY){var t,e,n=this.chart.scales;Object.keys(n).forEach((function(r){return"x"==r[0]&&(t=n[r])||(e=n[r])})),this.topY=e.top,this.bottomY=e.bottom,this.getXY=function(n,r){return{x:t.getPixelForValue(void 0,n,void 0,!0),y:e.getPixelForValue(r)}}}},t.prototype.draw=function(){var t=this.chart.chart.ctx;t.save();try{this.sections.forEach((function(e){return e.drawRegressions(t)}))}finally{t.restore()}},t}();e.MetaDataSet=i},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.MetaSection=void 0;var r=n(4),i={type:"linear",calculation:{precision:2,order:2},line:{width:2,color:"#000",dash:[]},extendPredictions:!1,copy:{overwriteData:"none"}},o=function(){function t(t,e){this._meta=e;var n,r,o,a,s=e.chart,c=e.dataset,u=(n=["type","calculation","line","extendPredictions","copy"],a=(r=s.config.options)&&(o=r.plugins)&&o.regressions||{},function t(e){for(var n=[],r=1;r<arguments.length;r++)n[r-1]=arguments[r];var i={};return e.forEach((function(e){n.forEach((function(n){var r=n[e],o=typeof r;"undefined"!=o&&(Array.isArray(r)||"object"!=o||null==r?i[e]=r:i[e]=Object.assign({},i[e],t(Object.keys(r),r)))}))})),i}(n,i,a,c.regressions,t));this.startIndex=t.startIndex||0,this.endIndex=t.endIndex||c.data.length-1,this.type=Array.isArray(u.type)?u.type:[u.type],this.line=u.line,this.calculation=u.calculation,this.extendPredictions=u.extendPredictions,this.copy=u.copy,this.label=t.label||this._meta.chart.data.labels[this.endIndex],this._validateType()}return t.prototype._validateType=function(){if(this.type.length>1&&this.type.includes("copy"))throw Error("Invalid regression type:"+this.type+'. "none" cannot be combined with other type!')},t.prototype.calculate=function(t,e){var n=this,i=t.data.slice(this.startIndex,this.endIndex+1).map((function(t,e){return[e+n.startIndex,t]}));if("copy"!=this.type[0])this.result=this.type.reduce((function(t,e){var o=r[e](i,n.calculation);return o.type=e,!t||t.r2<o.r2?o:t}),null);else if(this.copy.fromSectionIndex){var o=e.sections[this.copy.fromSectionIndex],a=this.result=Object.assign({},o.result),s=this.copy.overwriteData,c=t.data;a.points=i.map((function(t){return a.predict(t[0])})),delete a.r2,"none"!=s&&a.points.forEach((function(t){var e=t[0],r=t[1];(e<o.startIndex||e>o.endIndex)&&("all"==s||"last"==s&&e==n.endIndex||"empty"==s&&!c[e])&&(n.copy.maxValue&&(r=Math.min(n.copy.maxValue,r)),"number"==typeof n.copy.minValue&&(r=Math.max(n.copy.minValue,r)),c[e]=r)}))}},t.prototype.drawRightBorder=function(t){t.beginPath(),this._setLineAttrs(t),t.setLineDash([10,2]),t.lineWidth=2;var e=this._meta.getXY(this.endIndex,0);t.moveTo(e.x,this._meta.topY),t.lineTo(e.x,this._meta.bottomY),t.fillStyle=this.line.color,t.fillText(this.label,e.x,this._meta.topY),t.stroke()},t.prototype.drawRegressions=function(t){for(var e=0,n=this._meta.sections.length;e<n;e++){var r=this._meta.sections[e],i=r==this;if((i&&"copy"!=this.type[0]||!i&&this.extendPredictions)&&r.drawRange(t,this.startIndex,this.endIndex,!i),i)break}},t.prototype.drawRange=function(t,e,n,r){var i=this;t.beginPath(),this._setLineAttrs(t),r&&t.setLineDash([5,5]);var o=this.result.predict,a=function(t){return i._meta.getXY(t,o(t)[1])},s=a(e);t.moveTo(s.x,s.y);for(var c=e+1;c<=n;c++)s=a(c),t.lineTo(s.x,s.y);t.stroke()},t.prototype._setLineAttrs=function(t){this.line.width&&(t.lineWidth=this.line.width),this.line.color&&(t.strokeStyle=this.line.color),this.line.dash&&t.setLineDash(this.line.dash)},t}();e.MetaSection=o},function(t,e,n){"use strict";var r=this&&this.__createBinding||(Object.create?function(t,e,n,r){void 0===r&&(r=n),Object.defineProperty(t,r,{enumerable:!0,get:function(){return e[n]}})}:function(t,e,n,r){void 0===r&&(r=n),t[r]=e[n]}),i=this&&this.__exportStar||function(t,e){for(var n in t)"default"===n||e.hasOwnProperty(n)||r(e,t,n)};Object.defineProperty(e,"__esModule",{value:!0}),i(n(3),e),i(n(0),e),i(n(1),e),i(n(5),e)},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0})},function(t,e,n){var r,i,o;i=[t],void 0===(o="function"==typeof(r=function(t){"use strict";var e=Object.assign||function(t){for(var e=1;e<arguments.length;e++){var n=arguments[e];for(var r in n)Object.prototype.hasOwnProperty.call(n,r)&&(t[r]=n[r])}return t};function n(t){if(Array.isArray(t)){for(var e=0,n=Array(t.length);e<t.length;e++)n[e]=t[e];return n}return Array.from(t)}var r={order:2,precision:2,period:null};function i(t,e){var n=[],r=[];t.forEach((function(t,i){null!==t[1]&&(r.push(t),n.push(e[i]))}));var i=r.reduce((function(t,e){return t+e[1]}),0)/r.length,o=r.reduce((function(t,e){var n=e[1]-i;return t+n*n}),0);return 1-r.reduce((function(t,e,r){var i=n[r],o=e[1]-i[1];return t+o*o}),0)/o}function o(t,e){var n=Math.pow(10,e);return Math.round(t*n)/n}var a={linear:function(t,e){for(var n=[0,0,0,0,0],r=0,a=0;a<t.length;a++)null!==t[a][1]&&(r++,n[0]+=t[a][0],n[1]+=t[a][1],n[2]+=t[a][0]*t[a][0],n[3]+=t[a][0]*t[a][1],n[4]+=t[a][1]*t[a][1]);var s=r*n[2]-n[0]*n[0],c=r*n[3]-n[0]*n[1],u=0===s?0:o(c/s,e.precision),l=o(n[1]/r-u*n[0]/r,e.precision),p=function(t){return[o(t,e.precision),o(u*t+l,e.precision)]},f=t.map((function(t){return p(t[0])}));return{points:f,predict:p,equation:[u,l],r2:o(i(t,f),e.precision),string:0===l?"y = "+u+"x":"y = "+u+"x + "+l}},exponential:function(t,e){for(var n=[0,0,0,0,0,0],r=0;r<t.length;r++)null!==t[r][1]&&(n[0]+=t[r][0],n[1]+=t[r][1],n[2]+=t[r][0]*t[r][0]*t[r][1],n[3]+=t[r][1]*Math.log(t[r][1]),n[4]+=t[r][0]*t[r][1]*Math.log(t[r][1]),n[5]+=t[r][0]*t[r][1]);var a=n[1]*n[2]-n[5]*n[5],s=Math.exp((n[2]*n[3]-n[5]*n[4])/a),c=(n[1]*n[4]-n[5]*n[3])/a,u=o(s,e.precision),l=o(c,e.precision),p=function(t){return[o(t,e.precision),o(u*Math.exp(l*t),e.precision)]},f=t.map((function(t){return p(t[0])}));return{points:f,predict:p,equation:[u,l],string:"y = "+u+"e^("+l+"x)",r2:o(i(t,f),e.precision)}},logarithmic:function(t,e){for(var n=[0,0,0,0],r=t.length,a=0;a<r;a++)null!==t[a][1]&&(n[0]+=Math.log(t[a][0]),n[1]+=t[a][1]*Math.log(t[a][0]),n[2]+=t[a][1],n[3]+=Math.pow(Math.log(t[a][0]),2));var s=o((r*n[1]-n[2]*n[0])/(r*n[3]-n[0]*n[0]),e.precision),c=o((n[2]-s*n[0])/r,e.precision),u=function(t){return[o(t,e.precision),o(o(c+s*Math.log(t),e.precision),e.precision)]},l=t.map((function(t){return u(t[0])}));return{points:l,predict:u,equation:[c,s],string:"y = "+c+" + "+s+" ln(x)",r2:o(i(t,l),e.precision)}},power:function(t,e){for(var n=[0,0,0,0,0],r=t.length,a=0;a<r;a++)null!==t[a][1]&&(n[0]+=Math.log(t[a][0]),n[1]+=Math.log(t[a][1])*Math.log(t[a][0]),n[2]+=Math.log(t[a][1]),n[3]+=Math.pow(Math.log(t[a][0]),2));var s=(r*n[1]-n[0]*n[2])/(r*n[3]-Math.pow(n[0],2)),c=(n[2]-s*n[0])/r,u=o(Math.exp(c),e.precision),l=o(s,e.precision),p=function(t){return[o(t,e.precision),o(o(u*Math.pow(t,l),e.precision),e.precision)]},f=t.map((function(t){return p(t[0])}));return{points:f,predict:p,equation:[u,l],string:"y = "+u+"x^"+l,r2:o(i(t,f),e.precision)}},polynomial:function(t,e){for(var r=[],a=[],s=0,c=0,u=t.length,l=e.order+1,p=0;p<l;p++){for(var f=0;f<u;f++)null!==t[f][1]&&(s+=Math.pow(t[f][0],p)*t[f][1]);r.push(s),s=0;for(var h=[],d=0;d<l;d++){for(var y=0;y<u;y++)null!==t[y][1]&&(c+=Math.pow(t[y][0],p+d));h.push(c),c=0}a.push(h)}a.push(r);for(var v=function(t,e){for(var n=t,r=t.length-1,i=[e],o=0;o<r;o++){for(var a=o,s=o+1;s<r;s++)Math.abs(n[o][s])>Math.abs(n[o][a])&&(a=s);for(var c=o;c<r+1;c++){var u=n[c][o];n[c][o]=n[c][a],n[c][a]=u}for(var l=o+1;l<r;l++)for(var p=r;p>=o;p--)n[p][l]-=n[p][o]*n[o][l]/n[o][o]}for(var f=r-1;f>=0;f--){for(var h=0,d=f+1;d<r;d++)h+=n[d][f]*i[d];i[f]=(n[r][f]-h)/n[f][f]}return i}(a,l).map((function(t){return o(t,e.precision)})),g=function(t){return[o(t,e.precision),o(v.reduce((function(e,n,r){return e+n*Math.pow(t,r)}),0),e.precision)]},x=t.map((function(t){return g(t[0])})),b="y = ",m=v.length-1;m>=0;m--)b+=m>1?v[m]+"x^"+m+" + ":1===m?v[m]+"x + ":v[m];return{string:b,points:x,predict:g,equation:[].concat(n(v)).reverse(),r2:o(i(t,x),e.precision)}}};t.exports=Object.keys(a).reduce((function(t,n){return e({_round:o},t,(c=function(t,i){return a[n](t,e({},r,i))},(s=n)in(i={})?Object.defineProperty(i,s,{value:c,enumerable:!0,configurable:!0,writable:!0}):i[s]=c,i));var i,s,c}),{})})?r.apply(e,i):r)||(t.exports=o)},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.ChartRegressions=void 0;var r=n(0),i={},o=0,a=function(){function t(){this.id="regressions"}return t.prototype.beforeInit=function(t){t.$$id=++o},t.prototype.beforeUpdate=function(t,e){var n,o,a,c=(n=t.config.options)&&(o=n.plugins)&&(a=o.regressions)&&a.onCompleteCalculation;s(t,(function(e,n,o){n=new r.MetaDataSet(t,e);var a=1e3*t.$$id+o;i[a]=n})),c&&c(t)},t.prototype.beforeRender=function(t,e){s(t,(function(t,e){return e.adjustScales()}))},t.prototype.beforeDatasetsDraw=function(t,e,n){s(t,(function(e,n){var r=t.ctx;r.save();try{for(var i=0;i<n.sections.length-1;i++)n.sections[i].drawRightBorder(r)}finally{r.restore()}}))},t.prototype.afterDatasetsDraw=function(t,e,n){s(t,(function(t,e){return e.draw()}))},t.prototype.destroy=function(t){Object.keys(i).filter((function(e){return e/1e3>>0==t.$$id})).forEach((function(t){return delete i[t]}))},t.prototype.getDataset=function(t,e){var n=1e3*t.$$id+e;return i[n]},t.prototype.getSections=function(t,e){var n=this.getDataset(t,e);return n&&n.sections},t}();function s(t,n){t.data.datasets.forEach((function(r,i){if(r.regressions&&t.isDatasetVisible(i)){var o=e.ChartRegressions.getDataset(t,i);n(r,o,i)}}))}e.ChartRegressions=new a,window.ChartRegressions=e.ChartRegressions}]);
+/******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+/******/
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId]) {
+/******/ 			return installedModules[moduleId].exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			i: moduleId,
+/******/ 			l: false,
+/******/ 			exports: {}
+/******/ 		};
+/******/
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/
+/******/ 		// Flag the module as loaded
+/******/ 		module.l = true;
+/******/
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/
+/******/
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+/******/
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+/******/
+/******/ 	// define getter function for harmony exports
+/******/ 	__webpack_require__.d = function(exports, name, getter) {
+/******/ 		if(!__webpack_require__.o(exports, name)) {
+/******/ 			Object.defineProperty(exports, name, { enumerable: true, get: getter });
+/******/ 		}
+/******/ 	};
+/******/
+/******/ 	// define __esModule on exports
+/******/ 	__webpack_require__.r = function(exports) {
+/******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 		}
+/******/ 		Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 	};
+/******/
+/******/ 	// create a fake namespace object
+/******/ 	// mode & 1: value is a module id, require it
+/******/ 	// mode & 2: merge all properties of value into the ns
+/******/ 	// mode & 4: return value when already ns object
+/******/ 	// mode & 8|1: behave like require
+/******/ 	__webpack_require__.t = function(value, mode) {
+/******/ 		if(mode & 1) value = __webpack_require__(value);
+/******/ 		if(mode & 8) return value;
+/******/ 		if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
+/******/ 		var ns = Object.create(null);
+/******/ 		__webpack_require__.r(ns);
+/******/ 		Object.defineProperty(ns, 'default', { enumerable: true, value: value });
+/******/ 		if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
+/******/ 		return ns;
+/******/ 	};
+/******/
+/******/ 	// getDefaultExport function for compatibility with non-harmony modules
+/******/ 	__webpack_require__.n = function(module) {
+/******/ 		var getter = module && module.__esModule ?
+/******/ 			function getDefault() { return module['default']; } :
+/******/ 			function getModuleExports() { return module; };
+/******/ 		__webpack_require__.d(getter, 'a', getter);
+/******/ 		return getter;
+/******/ 	};
+/******/
+/******/ 	// Object.prototype.hasOwnProperty.call
+/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
+/******/
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "";
+/******/
+/******/
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(__webpack_require__.s = "./lib/index.js");
+/******/ })
+/************************************************************************/
+/******/ ({
+
+/***/ "./lib/MetaData.js":
+/*!*************************!*\
+  !*** ./lib/MetaData.js ***!
+  \*************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.MetaDataSet = void 0;
+var MetaSection_1 = __webpack_require__(/*! ./MetaSection */ "./lib/MetaSection.js");
+var MetaDataSet = /** @class */ (function () {
+    function MetaDataSet(chart, ds) {
+        /** Scales wil be initialized in beforeDraw hook */
+        this.getXY = undefined;
+        /** Is the dataset's data an array of {x,y}? */
+        this.isXY = false;
+        var cfg = ds.regressions;
+        this.chart = chart;
+        this.dataset = ds;
+        this.normalizedData = this._normalizeData(ds.data);
+        this.sections = this._createMetaSections(cfg);
+        this._calculate();
+    }
+    /**
+     * Normalize data to DataPoint[]
+     * Only supports number[] and {x:number,y:number}
+     */
+    MetaDataSet.prototype._normalizeData = function (data) {
+        var _this = this;
+        return data.map(function (value, index) {
+            var p;
+            if (typeof value == 'number' || value == null || value === undefined) {
+                p = [index, value];
+            }
+            else {
+                _this.isXY = true;
+                p = [value.x, value.y];
+            }
+            return p;
+        });
+    };
+    /** @private */
+    MetaDataSet.prototype._createMetaSections = function (cfg) {
+        var _this = this;
+        var source = cfg.sections || [{ startIndex: 0, endIndex: this.dataset.data.length - 1 }];
+        return source.map(function (s) { return new MetaSection_1.MetaSection(s, _this); });
+    };
+    /** @private */
+    MetaDataSet.prototype._calculate = function () {
+        this.sections.forEach(function (section) { return section.calculate(); }); // Calculate Section Results
+    };
+    MetaDataSet.prototype.adjustScales = function () {
+        if (this.topY !== undefined)
+            return;
+        var xScale;
+        var yScale;
+        var scales = this.chart.scales;
+        Object.keys(scales).forEach(function (k) { return k[0] == 'x' && (xScale = scales[k]) || (yScale = scales[k]); });
+        this.topY = yScale.top;
+        this.bottomY = yScale.bottom;
+        this.getXY =
+            function (x, y) {
+                return ({
+                    x: xScale.getPixelForValue(x, undefined, undefined, true),
+                    y: yScale.getPixelForValue(y)
+                });
+            };
+    };
+    MetaDataSet.prototype.draw = function () {
+        var ctx = this.chart.chart.ctx;
+        ctx.save();
+        try {
+            this.sections.forEach(function (section) { return section.drawRegressions(ctx); });
+        }
+        finally {
+            ctx.restore();
+        }
+    };
+    return MetaDataSet;
+}());
+exports.MetaDataSet = MetaDataSet;
+//# sourceMappingURL=MetaData.js.map
+
+/***/ }),
+
+/***/ "./lib/MetaSection.js":
+/*!****************************!*\
+  !*** ./lib/MetaSection.js ***!
+  \****************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.MetaSection = void 0;
+var regression = __webpack_require__(/*! regression */ "./node_modules/regression/dist/regression.js");
+var defaultConfig = {
+    type: "linear",
+    calculation: {
+        precision: 2,
+        order: 2
+    },
+    line: {
+        width: 2,
+        color: '#000',
+        dash: []
+    },
+    extendPredictions: false,
+    copy: {
+        overwriteData: 'none'
+    }
+};
+var MetaSection = /** @class */ (function () {
+    function MetaSection(sec, _meta) {
+        this._meta = _meta;
+        var chart = _meta.chart;
+        var ds = _meta.dataset;
+        var cfg = getConfig(['type', 'calculation', 'line', 'extendPredictions', 'copy']);
+        this.startIndex = sec.startIndex || 0;
+        this.endIndex = sec.endIndex || ds.data.length - 1;
+        this.type = Array.isArray(cfg.type) ? cfg.type : [cfg.type];
+        this.line = cfg.line;
+        this.calculation = cfg.calculation;
+        this.extendPredictions = cfg.extendPredictions;
+        this.copy = cfg.copy;
+        this.label = sec.label || this._meta.chart.data.labels[this.endIndex];
+        this._validateType();
+        // --- constructor helpers
+        /**
+         * Calculate the inherited configuration from defaultConfig, globalConfig,
+         * dataset config, and section config (in that order)
+         */
+        function getConfig(fields) {
+            var o, p;
+            var globalConfig = (o = chart.config.options) && (p = o.plugins) && p.regressions || {};
+            return configMerge(fields, defaultConfig, globalConfig, ds.regressions, sec);
+            /** merge the config objects */
+            function configMerge(fields) {
+                var cfgList = [];
+                for (var _i = 1; _i < arguments.length; _i++) {
+                    cfgList[_i - 1] = arguments[_i];
+                }
+                var dstConfig = {};
+                fields.forEach(function (f) {
+                    cfgList.forEach(function (srcConfig) {
+                        var o = srcConfig[f];
+                        var t = typeof o;
+                        if (t != 'undefined') {
+                            if (Array.isArray(o) || t != 'object' || o == null)
+                                dstConfig[f] = o;
+                            else
+                                dstConfig[f] = Object.assign({}, dstConfig[f], configMerge(Object.keys(o), o));
+                        }
+                    });
+                });
+                return dstConfig;
+            }
+        }
+    }
+    /** Validates the type to avoid inconsistences */
+    MetaSection.prototype._validateType = function () {
+        if (this.type.length > 1 && this.type.includes('copy'))
+            throw Error('Invalid regression type:' + this.type + '. "none" cannot be combined with other type!');
+    };
+    /** Calculates the regression(s) and sets the result objects */
+    MetaSection.prototype.calculate = function () {
+        var sectionData = this._meta.normalizedData.slice(this.startIndex, this.endIndex + 1);
+        if (this.type[0] == 'copy')
+            this._calculateCopySection(sectionData);
+        else
+            this._calculateBestR2(sectionData);
+    };
+    MetaSection.prototype._calculateBestR2 = function (sectionData) {
+        var _this = this;
+        this.result = this.type.reduce(function (max, type) {
+            var calculation = Object.assign({}, _this.calculation);
+            var realType = type;
+            if (/polynomial[34]$/.test(type)) {
+                calculation.order = parseInt(type.substr(10));
+                realType = type.substr(0, 10);
+            }
+            var r = regression[realType](sectionData, calculation);
+            r.type = type;
+            return (!max || max.r2 < r.r2) ? r : max;
+        }, null);
+    };
+    MetaSection.prototype._calculateCopySection = function (sectionData) {
+        var _this = this;
+        var from = this._meta.sections[this.copy.fromSectionIndex], r = this.result = Object.assign({}, from.result), overwrite = this.copy.overwriteData, data = this._meta.normalizedData;
+        r.points = sectionData.map(function (p) { return r.predict(p[0]); });
+        delete r.r2;
+        if (overwrite != 'none') {
+            var dsdata_1 = this._meta.dataset.data, isXY_1 = this._meta.isXY;
+            r.points.forEach(function (_a, i) {
+                var x = _a[0], y = _a[1];
+                var index = i + _this.startIndex;
+                if ((index < from.startIndex || index > from.endIndex) &&
+                    (overwrite == 'all' ||
+                        overwrite == 'last' && index == _this.endIndex ||
+                        overwrite == 'empty' && !data[index])) {
+                    if (_this.copy.maxValue)
+                        y = Math.min(_this.copy.maxValue, y);
+                    if (_this.copy.minValue !== undefined)
+                        y = Math.max(_this.copy.minValue, y);
+                    dsdata_1[index] = isXY_1 ? { x: x, y: y } : y;
+                }
+            });
+        }
+    };
+    MetaSection.prototype.drawRightBorder = function (ctx) {
+        ctx.beginPath();
+        this._setLineAttrs(ctx);
+        ctx.setLineDash([10, 2]);
+        ctx.lineWidth = 2;
+        // Print vertical line
+        var p = this._meta.getXY(this.endIndex, 0);
+        ctx.moveTo(p.x, this._meta.topY);
+        ctx.lineTo(p.x, this._meta.bottomY);
+        ctx.fillStyle = this.line.color;
+        ctx.fillText(this.label, p.x, this._meta.topY);
+        ctx.stroke();
+    };
+    MetaSection.prototype.drawRegressions = function (ctx) {
+        for (var i = 0, len = this._meta.sections.length; i < len; i++) {
+            var section = this._meta.sections[i];
+            var isMe = section == this;
+            if (isMe && this.type[0] != 'copy' || !isMe && this.extendPredictions) {
+                section.drawRange(ctx, this.startIndex, this.endIndex, !isMe);
+            }
+            if (isMe)
+                break;
+        }
+    };
+    MetaSection.prototype.drawRange = function (ctx, startIndex, endIndex, forceDash) {
+        var _this = this;
+        ctx.beginPath();
+        this._setLineAttrs(ctx);
+        if (forceDash)
+            ctx.setLineDash([5, 5]);
+        var predict = this.result.predict;
+        var f = function (x) { return _this._meta.getXY(x, predict(x)[1]); };
+        var p = f(startIndex);
+        ctx.moveTo(p.x, p.y);
+        for (var x = startIndex + 1; x <= endIndex; x++) {
+            p = f(x);
+            ctx.lineTo(p.x, p.y);
+        }
+        ctx.stroke();
+    };
+    MetaSection.prototype._setLineAttrs = function (ctx) {
+        if (this.line.width)
+            ctx.lineWidth = this.line.width;
+        if (this.line.color)
+            ctx.strokeStyle = this.line.color;
+        if (this.line.dash)
+            ctx.setLineDash(this.line.dash);
+    };
+    return MetaSection;
+}());
+exports.MetaSection = MetaSection;
+//# sourceMappingURL=MetaSection.js.map
+
+/***/ }),
+
+/***/ "./lib/index.js":
+/*!**********************!*\
+  !*** ./lib/index.js ***!
+  \**********************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __exportStar = (this && this.__exportStar) || function(m, exports) {
+    for (var p in m) if (p !== "default" && !exports.hasOwnProperty(p)) __createBinding(exports, m, p);
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+__exportStar(__webpack_require__(/*! ./types */ "./lib/types.js"), exports);
+__exportStar(__webpack_require__(/*! ./MetaData */ "./lib/MetaData.js"), exports);
+__exportStar(__webpack_require__(/*! ./MetaSection */ "./lib/MetaSection.js"), exports);
+__exportStar(__webpack_require__(/*! ./regression-plugin */ "./lib/regression-plugin.js"), exports);
+//# sourceMappingURL=index.js.map
+
+/***/ }),
+
+/***/ "./lib/regression-plugin.js":
+/*!**********************************!*\
+  !*** ./lib/regression-plugin.js ***!
+  \**********************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ChartRegressions = void 0;
+var MetaData_1 = __webpack_require__(/*! ./MetaData */ "./lib/MetaData.js");
+// Cache for all plugins' metadata
+var _metadataMap = {};
+var _chartId = 0;
+var Plugin = /** @class */ (function () {
+    function Plugin() {
+        this.id = 'regressions';
+    }
+    Plugin.prototype.beforeInit = function (chart) {
+        chart.$$id = ++_chartId;
+    };
+    /**
+     * Called after update (when the chart is created and when chart.update() is called)
+     * @param chart
+     */
+    Plugin.prototype.beforeUpdate = function (chart, options) {
+        var o, p, r;
+        var onComplete = (o = chart.config.options) && (p = o.plugins)
+            && (r = p.regressions) && r.onCompleteCalculation;
+        forEach(chart, function (ds, meta, datasetIndex) {
+            meta = new MetaData_1.MetaDataSet(chart, ds);
+            var id = chart.$$id * 1000 + datasetIndex;
+            _metadataMap[id] = meta;
+        });
+        if (onComplete)
+            onComplete(chart);
+    };
+    /**
+     * It's called once before all the drawing
+     * @param chart
+     */
+    Plugin.prototype.beforeRender = function (chart, options) {
+        forEach(chart, function (ds, meta) { return meta.adjustScales(); });
+    };
+    /** Draws the vertical lines before the datasets are drawn */
+    Plugin.prototype.beforeDatasetsDraw = function (chart, easing, options) {
+        forEach(chart, function (ds, meta) {
+            var ctx = chart.ctx;
+            ctx.save();
+            try {
+                for (var i = 0; i < meta.sections.length - 1; i++)
+                    meta.sections[i].drawRightBorder(ctx);
+            }
+            finally {
+                ctx.restore();
+            }
+            ;
+        });
+    };
+    /** Draws the regression lines */
+    Plugin.prototype.afterDatasetsDraw = function (chart, easing, options) {
+        forEach(chart, function (ds, meta) { return meta.draw(); });
+    };
+    Plugin.prototype.destroy = function (chart) {
+        Object.keys(_metadataMap)
+            .filter(function (k) { return (k / 1000) >> 0 == chart.$$id; })
+            .forEach(function (k) { return delete _metadataMap[k]; });
+    };
+    /** Get dataset's meta data */
+    Plugin.prototype.getDataset = function (chart, datasetIndex) {
+        var id = chart.$$id * 1000 + datasetIndex;
+        return _metadataMap[id];
+    };
+    /** Get dataset's meta sections */
+    Plugin.prototype.getSections = function (chart, datasetIndex) {
+        var ds = this.getDataset(chart, datasetIndex);
+        return ds && ds.sections;
+    };
+    return Plugin;
+}());
+function forEach(chart, fn) {
+    chart.data.datasets.forEach(function (ds, i) {
+        if (ds.regressions && chart.isDatasetVisible(i)) {
+            var meta = exports.ChartRegressions.getDataset(chart, i);
+            fn(ds, meta, i);
+        }
+    });
+}
+exports.ChartRegressions = new Plugin();
+window.ChartRegressions = exports.ChartRegressions;
+//# sourceMappingURL=regression-plugin.js.map
+
+/***/ }),
+
+/***/ "./lib/types.js":
+/*!**********************!*\
+  !*** ./lib/types.js ***!
+  \**********************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+//# sourceMappingURL=types.js.map
+
+/***/ }),
+
+/***/ "./node_modules/regression/dist/regression.js":
+/*!****************************************************!*\
+  !*** ./node_modules/regression/dist/regression.js ***!
+  \****************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;(function (global, factory) {
+  if (true) {
+    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [module], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
+				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
+				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+  } else { var mod; }
+})(this, function (module) {
+  'use strict';
+
+  function _defineProperty(obj, key, value) {
+    if (key in obj) {
+      Object.defineProperty(obj, key, {
+        value: value,
+        enumerable: true,
+        configurable: true,
+        writable: true
+      });
+    } else {
+      obj[key] = value;
+    }
+
+    return obj;
+  }
+
+  var _extends = Object.assign || function (target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i];
+
+      for (var key in source) {
+        if (Object.prototype.hasOwnProperty.call(source, key)) {
+          target[key] = source[key];
+        }
+      }
+    }
+
+    return target;
+  };
+
+  function _toConsumableArray(arr) {
+    if (Array.isArray(arr)) {
+      for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) {
+        arr2[i] = arr[i];
+      }
+
+      return arr2;
+    } else {
+      return Array.from(arr);
+    }
+  }
+
+  var DEFAULT_OPTIONS = { order: 2, precision: 2, period: null };
+
+  /**
+  * Determine the coefficient of determination (r^2) of a fit from the observations
+  * and predictions.
+  *
+  * @param {Array<Array<number>>} data - Pairs of observed x-y values
+  * @param {Array<Array<number>>} results - Pairs of observed predicted x-y values
+  *
+  * @return {number} - The r^2 value, or NaN if one cannot be calculated.
+  */
+  function determinationCoefficient(data, results) {
+    var predictions = [];
+    var observations = [];
+
+    data.forEach(function (d, i) {
+      if (d[1] !== null) {
+        observations.push(d);
+        predictions.push(results[i]);
+      }
+    });
+
+    var sum = observations.reduce(function (a, observation) {
+      return a + observation[1];
+    }, 0);
+    var mean = sum / observations.length;
+
+    var ssyy = observations.reduce(function (a, observation) {
+      var difference = observation[1] - mean;
+      return a + difference * difference;
+    }, 0);
+
+    var sse = observations.reduce(function (accum, observation, index) {
+      var prediction = predictions[index];
+      var residual = observation[1] - prediction[1];
+      return accum + residual * residual;
+    }, 0);
+
+    return 1 - sse / ssyy;
+  }
+
+  /**
+  * Determine the solution of a system of linear equations A * x = b using
+  * Gaussian elimination.
+  *
+  * @param {Array<Array<number>>} input - A 2-d matrix of data in row-major form [ A | b ]
+  * @param {number} order - How many degrees to solve for
+  *
+  * @return {Array<number>} - Vector of normalized solution coefficients matrix (x)
+  */
+  function gaussianElimination(input, order) {
+    var matrix = input;
+    var n = input.length - 1;
+    var coefficients = [order];
+
+    for (var i = 0; i < n; i++) {
+      var maxrow = i;
+      for (var j = i + 1; j < n; j++) {
+        if (Math.abs(matrix[i][j]) > Math.abs(matrix[i][maxrow])) {
+          maxrow = j;
+        }
+      }
+
+      for (var k = i; k < n + 1; k++) {
+        var tmp = matrix[k][i];
+        matrix[k][i] = matrix[k][maxrow];
+        matrix[k][maxrow] = tmp;
+      }
+
+      for (var _j = i + 1; _j < n; _j++) {
+        for (var _k = n; _k >= i; _k--) {
+          matrix[_k][_j] -= matrix[_k][i] * matrix[i][_j] / matrix[i][i];
+        }
+      }
+    }
+
+    for (var _j2 = n - 1; _j2 >= 0; _j2--) {
+      var total = 0;
+      for (var _k2 = _j2 + 1; _k2 < n; _k2++) {
+        total += matrix[_k2][_j2] * coefficients[_k2];
+      }
+
+      coefficients[_j2] = (matrix[n][_j2] - total) / matrix[_j2][_j2];
+    }
+
+    return coefficients;
+  }
+
+  /**
+  * Round a number to a precision, specificed in number of decimal places
+  *
+  * @param {number} number - The number to round
+  * @param {number} precision - The number of decimal places to round to:
+  *                             > 0 means decimals, < 0 means powers of 10
+  *
+  *
+  * @return {numbr} - The number, rounded
+  */
+  function round(number, precision) {
+    var factor = Math.pow(10, precision);
+    return Math.round(number * factor) / factor;
+  }
+
+  /**
+  * The set of all fitting methods
+  *
+  * @namespace
+  */
+  var methods = {
+    linear: function linear(data, options) {
+      var sum = [0, 0, 0, 0, 0];
+      var len = 0;
+
+      for (var n = 0; n < data.length; n++) {
+        if (data[n][1] !== null) {
+          len++;
+          sum[0] += data[n][0];
+          sum[1] += data[n][1];
+          sum[2] += data[n][0] * data[n][0];
+          sum[3] += data[n][0] * data[n][1];
+          sum[4] += data[n][1] * data[n][1];
+        }
+      }
+
+      var run = len * sum[2] - sum[0] * sum[0];
+      var rise = len * sum[3] - sum[0] * sum[1];
+      var gradient = run === 0 ? 0 : round(rise / run, options.precision);
+      var intercept = round(sum[1] / len - gradient * sum[0] / len, options.precision);
+
+      var predict = function predict(x) {
+        return [round(x, options.precision), round(gradient * x + intercept, options.precision)];
+      };
+
+      var points = data.map(function (point) {
+        return predict(point[0]);
+      });
+
+      return {
+        points: points,
+        predict: predict,
+        equation: [gradient, intercept],
+        r2: round(determinationCoefficient(data, points), options.precision),
+        string: intercept === 0 ? 'y = ' + gradient + 'x' : 'y = ' + gradient + 'x + ' + intercept
+      };
+    },
+    exponential: function exponential(data, options) {
+      var sum = [0, 0, 0, 0, 0, 0];
+
+      for (var n = 0; n < data.length; n++) {
+        if (data[n][1] !== null) {
+          sum[0] += data[n][0];
+          sum[1] += data[n][1];
+          sum[2] += data[n][0] * data[n][0] * data[n][1];
+          sum[3] += data[n][1] * Math.log(data[n][1]);
+          sum[4] += data[n][0] * data[n][1] * Math.log(data[n][1]);
+          sum[5] += data[n][0] * data[n][1];
+        }
+      }
+
+      var denominator = sum[1] * sum[2] - sum[5] * sum[5];
+      var a = Math.exp((sum[2] * sum[3] - sum[5] * sum[4]) / denominator);
+      var b = (sum[1] * sum[4] - sum[5] * sum[3]) / denominator;
+      var coeffA = round(a, options.precision);
+      var coeffB = round(b, options.precision);
+      var predict = function predict(x) {
+        return [round(x, options.precision), round(coeffA * Math.exp(coeffB * x), options.precision)];
+      };
+
+      var points = data.map(function (point) {
+        return predict(point[0]);
+      });
+
+      return {
+        points: points,
+        predict: predict,
+        equation: [coeffA, coeffB],
+        string: 'y = ' + coeffA + 'e^(' + coeffB + 'x)',
+        r2: round(determinationCoefficient(data, points), options.precision)
+      };
+    },
+    logarithmic: function logarithmic(data, options) {
+      var sum = [0, 0, 0, 0];
+      var len = data.length;
+
+      for (var n = 0; n < len; n++) {
+        if (data[n][1] !== null) {
+          sum[0] += Math.log(data[n][0]);
+          sum[1] += data[n][1] * Math.log(data[n][0]);
+          sum[2] += data[n][1];
+          sum[3] += Math.pow(Math.log(data[n][0]), 2);
+        }
+      }
+
+      var a = (len * sum[1] - sum[2] * sum[0]) / (len * sum[3] - sum[0] * sum[0]);
+      var coeffB = round(a, options.precision);
+      var coeffA = round((sum[2] - coeffB * sum[0]) / len, options.precision);
+
+      var predict = function predict(x) {
+        return [round(x, options.precision), round(round(coeffA + coeffB * Math.log(x), options.precision), options.precision)];
+      };
+
+      var points = data.map(function (point) {
+        return predict(point[0]);
+      });
+
+      return {
+        points: points,
+        predict: predict,
+        equation: [coeffA, coeffB],
+        string: 'y = ' + coeffA + ' + ' + coeffB + ' ln(x)',
+        r2: round(determinationCoefficient(data, points), options.precision)
+      };
+    },
+    power: function power(data, options) {
+      var sum = [0, 0, 0, 0, 0];
+      var len = data.length;
+
+      for (var n = 0; n < len; n++) {
+        if (data[n][1] !== null) {
+          sum[0] += Math.log(data[n][0]);
+          sum[1] += Math.log(data[n][1]) * Math.log(data[n][0]);
+          sum[2] += Math.log(data[n][1]);
+          sum[3] += Math.pow(Math.log(data[n][0]), 2);
+        }
+      }
+
+      var b = (len * sum[1] - sum[0] * sum[2]) / (len * sum[3] - Math.pow(sum[0], 2));
+      var a = (sum[2] - b * sum[0]) / len;
+      var coeffA = round(Math.exp(a), options.precision);
+      var coeffB = round(b, options.precision);
+
+      var predict = function predict(x) {
+        return [round(x, options.precision), round(round(coeffA * Math.pow(x, coeffB), options.precision), options.precision)];
+      };
+
+      var points = data.map(function (point) {
+        return predict(point[0]);
+      });
+
+      return {
+        points: points,
+        predict: predict,
+        equation: [coeffA, coeffB],
+        string: 'y = ' + coeffA + 'x^' + coeffB,
+        r2: round(determinationCoefficient(data, points), options.precision)
+      };
+    },
+    polynomial: function polynomial(data, options) {
+      var lhs = [];
+      var rhs = [];
+      var a = 0;
+      var b = 0;
+      var len = data.length;
+      var k = options.order + 1;
+
+      for (var i = 0; i < k; i++) {
+        for (var l = 0; l < len; l++) {
+          if (data[l][1] !== null) {
+            a += Math.pow(data[l][0], i) * data[l][1];
+          }
+        }
+
+        lhs.push(a);
+        a = 0;
+
+        var c = [];
+        for (var j = 0; j < k; j++) {
+          for (var _l = 0; _l < len; _l++) {
+            if (data[_l][1] !== null) {
+              b += Math.pow(data[_l][0], i + j);
+            }
+          }
+          c.push(b);
+          b = 0;
+        }
+        rhs.push(c);
+      }
+      rhs.push(lhs);
+
+      var coefficients = gaussianElimination(rhs, k).map(function (v) {
+        return round(v, options.precision);
+      });
+
+      var predict = function predict(x) {
+        return [round(x, options.precision), round(coefficients.reduce(function (sum, coeff, power) {
+          return sum + coeff * Math.pow(x, power);
+        }, 0), options.precision)];
+      };
+
+      var points = data.map(function (point) {
+        return predict(point[0]);
+      });
+
+      var string = 'y = ';
+      for (var _i = coefficients.length - 1; _i >= 0; _i--) {
+        if (_i > 1) {
+          string += coefficients[_i] + 'x^' + _i + ' + ';
+        } else if (_i === 1) {
+          string += coefficients[_i] + 'x + ';
+        } else {
+          string += coefficients[_i];
+        }
+      }
+
+      return {
+        string: string,
+        points: points,
+        predict: predict,
+        equation: [].concat(_toConsumableArray(coefficients)).reverse(),
+        r2: round(determinationCoefficient(data, points), options.precision)
+      };
+    }
+  };
+
+  function createWrapper() {
+    var reduce = function reduce(accumulator, name) {
+      return _extends({
+        _round: round
+      }, accumulator, _defineProperty({}, name, function (data, supplied) {
+        return methods[name](data, _extends({}, DEFAULT_OPTIONS, supplied));
+      }));
+    };
+
+    return Object.keys(methods).reduce(reduce, {});
+  }
+
+  module.exports = createWrapper();
+});
+
+
+/***/ })
+
+/******/ });
+//# sourceMappingURL=chartjs-plugin-regression-0.1.1.js.map

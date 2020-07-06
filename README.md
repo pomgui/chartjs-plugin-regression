@@ -6,7 +6,8 @@ The plugin, at the current version, uses the [regression](https://www.npmjs.com/
 npm package as its calculation engine.
 
 ### Important
-It's restricted to bar and line chart types.
+- Only `bar`, `line`, and `scatter` chart types are supported.
+- The plugin only has been tested with Chart.js version 2.9.3.
 
 ## Demo
 For a better understanding of the capabilities of this plugin, please see this 
@@ -22,9 +23,11 @@ version includes the regression package.
 
 ## Usage
 
-For a single chart, it needs to be listed in plugins section (see below).
+For a single chart, it needs to be listed in plugins section. 
 
-```JavaScript
+### Example:
+
+```javaScript
 new Chart(ctx, {
   type: 'bar',
   plugins: [
@@ -55,7 +58,7 @@ Also, it's possible to register the plugin for all the charts:
 Chart.plugins.register(ChartRegressions);
 ```
 
-### Configuration
+## Configuration
 
 The plugin has three levels of configuration:
 
@@ -65,13 +68,13 @@ The plugin has three levels of configuration:
 
 There are common properties that the three levels share, and the priority of them are: section, dataset, and global.
 
-#### Common properties
+### Common properties
 
 Common to the three levels of configuration.
 
 | Property | Description |
 |---|---|
-| type | Type of regression to be calculated. It can be 'copy', 'linear', 'exponential', 'power', 'polynomial', or 'logarithmic'. Or an array with a combination of them, in which case the regression type with the best [_R²_](https://en.wikipedia.org/wiki/Coefficient_of_determination) will be drawn. |
+| type | Type of regression to be calculated. It can be 'copy', 'linear', 'exponential', 'power', 'polynomial', 'polynomial3', 'polynomial4', or 'logarithmic'. It also can be an array with a combination of these types, in which case the regression type with the best [_R²_](https://en.wikipedia.org/wiki/Coefficient_of_determination) will be drawn. |
 | line | Line configuration for drawing the regression. It has the following properties: `{width, color, dash}` |
 | calculation | Precision and polynomial order of the values returned by the regression calculations |
 | extendPredictions | Previous sections predictions for the current section will be drawed as dashed lines |
@@ -79,23 +82,31 @@ Common to the three levels of configuration.
 
 Some considerations:
 
+- `type`: polynomial3 and polynomial4 are pseudo-types added for convenience, they allow combinationss where the plugin will draw the regression with bigger R². Example:
+
+```javascript
+{
+  type: ['polynomial', 'polynomial3', 'polynomial4'],
+  calculation: {order 2}
+}
+```
+
 - `calculation` has the following properties:
 
 | Property | Description |
 |---|---|
-| `precision` | how many decimals will have the results? (default: 2) |
-| `order` | Only for polynomial regressions. Example: _ax² + bx + c_ has order 2. |
-
+| `precision` | Determines how many decimals will have the results (default: 2). |
+| `order` | Only for `polynomial` regression type, i.e. `polynomial3` and `polynomial4` are not affected by this property. Example: _ax² + bx + c_ has order 2.  |
 
 - `copy` has the following properties:
 
 | Property | Description |
 |---|---|
-| `overwriteData` | can be 'none', 'all', 'empty', or 'last'. Default: 'none'. It determines how the dataset's data will be overwritten in this section (empty: Only zero, undefined, or null data will be overwriten). |
+| `overwriteData` | Possible values: 'none', 'all', 'empty', or 'last'. Default: 'none'. It determines how the dataset's data will be overwritten in this section (empty: Only zero, undefined, or null data will be overwriten). **Obs.** the plugin is only prepared to overwrite numerical data arrays, e.g. `[1,2,3,...]`, scatter charts use xy data arrays, e.g. `[{x:1,y:1}, {x:2,y:2},...]`, with them the behavior is undetermined. In these cases it's better use `overwriteData: 'none'`. |
 | `minValue` | Minimum value that the predicted value can be written into the data. |
 | `maxValue` | Maximum value that the predicted value can be written into the data. |
 
-#### Global
+### Global
 
 The global configuration affects all the regressions calculated for all the datasets in the chart. It contains all the common properties and the following properties:
 
@@ -117,7 +128,7 @@ options: {
 }
 ```
 
-#### Per Dataset
+### Per Dataset
 
 It's possible to configure the regressions per dataset. The configuration will contain all the common properties and the following properties:
 
@@ -143,7 +154,7 @@ datasets: [
 ]
 ```
 
-#### Per Section
+### Per Section
 
 Each section can be configured independently using all the common properties and the following properties:
 
@@ -185,9 +196,9 @@ datasets: [
 ]
 ```
 
-### API
+## API
 
-#### .getDataset(chart, datasetIndex)
+### .getDataset(chart, datasetIndex)
 
 Returns the metadata associated to one dataset used internally by the plugin to work.
 
@@ -200,11 +211,11 @@ This object provides the following information:
 | Property | Description |
 |---|---|
 | `sections` | array of sections for each dataset (it will contain at least 1 section) |
-| `getXY(tickIndex, y)` | Returns the canvas coordinates {x,y} for a value `y` over a tick. |
+| `getXY(x, y)` | Returns the canvas coordinates {x,y} for the data point `x, y`. |
 | `topY` | Minimum y coordinate in the canvas. |
 | `bottomY` | Maximum y coordinate in the canvas. |
 
-#### .getSections(chart, datasetIndex)
+### .getSections(chart, datasetIndex)
 
 Returns the sections with all the properties calculated (some with default values, or inherited from dataset's plugin configuration or the global configuration in options).
 
@@ -218,9 +229,9 @@ This object provides the following information:
 | `line` | Configuration used to draw the lines {color, width, dash}. |
 | `result` | Regression calculation result (see [demo](https://pomgui.github.io/chartjs-plugin-regression/demo/)) to see how to use this information. |
 
-### Events
+## Events
 
-#### onCompleteCalculation(chart)
+### onCompleteCalculation(chart)
 
 The plugin provides one single event to inform when the calculation of all the regresions for a chart have been conmpleted. 
 
