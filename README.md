@@ -7,7 +7,8 @@ npm package as its calculation engine.
 
 ### Important
 - Only `bar`, `line`, and `scatter` chart types are supported.
-- The plugin only has been tested with Chart.js version 2.9.3.
+- The plugin works just fine since chart.js@2.5.0, however chart.js may have some problems handling certain color configuration (not related with the plugin). No problems have been found since chart.js@2.6.0.
+- The plugin does not work with chart.js@3.x
 
 ## Demo
 For a better understanding of the capabilities of this plugin, please see this 

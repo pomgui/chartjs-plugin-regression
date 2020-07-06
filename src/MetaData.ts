@@ -77,11 +77,22 @@ export class MetaDataSet {
     });
   }
 
-  draw() {
+  drawRegressions() {
     const ctx: CanvasRenderingContext2D = (this.chart as any).chart.ctx;
     ctx.save();
     try {
       this.sections.forEach(section => section.drawRegressions(ctx));
+    } finally {
+      ctx.restore();
+    }
+  }
+
+  drawRightBorders() {
+    const ctx: CanvasRenderingContext2D = (this.chart as any).chart.ctx;
+    ctx.save();
+    try {
+      for (let i = 0; i < this.sections.length - 1; i++)
+        this.sections[i].drawRightBorder(ctx);
     } finally {
       ctx.restore();
     }

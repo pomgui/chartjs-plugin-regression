@@ -53,21 +53,12 @@ class Plugin
 
   /** Draws the vertical lines before the datasets are drawn */
   beforeDatasetsDraw(chart: Chart, easing: Easing, options?: any): void {
-    forEach(chart, (ds, meta) => {
-      const ctx = chart.ctx!;
-      ctx.save();
-      try {
-        for (let i = 0; i < meta.sections.length - 1; i++)
-          meta.sections[i].drawRightBorder(ctx);
-      } finally {
-        ctx.restore();
-      }
-    });
+    forEach(chart, (ds, meta) => meta.drawRightBorders());
   }
 
   /** Draws the regression lines */
   afterDatasetsDraw(chart: Chart, easing: Easing, options?: any): void {
-    forEach(chart, (ds, meta) => meta.draw());
+    forEach(chart, (ds, meta) => meta.drawRegressions());
   }
 
   destroy(chart: Chart): void {

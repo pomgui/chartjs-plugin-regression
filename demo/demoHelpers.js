@@ -55,12 +55,9 @@ var helpers = new (function () {
     };
   }
 
-  this.generateColors = function (numElems, id, opaque) {
-    var normal = color(id, opaque);
-    var predicted = '#888888';
-    if (opaque != 1) {
-      predicted += '80';
-    }
+  this.generateColors = function (numElems, id, alpha) {
+    var normal = this.color(id, alpha);
+    var predicted = 'rgba(136,136,136,' + alpha + ')';
     var colors = new Array(numElems);
     for (var i = 0; i < numElems; i++)
       colors[i] = i < demo.NUM_NORMAL_ELEMS ? normal : predicted;
@@ -85,14 +82,9 @@ var helpers = new (function () {
     }
   };
 
-  this.color = color;
-
-  function color(id, opaque) {
-    if (opaque == 1) opaque = '';
-    else {
-      opaque = Math.trunc(opaque * 255).toString(16);
-      if (opaque.length == 1) opaque = '0' + opaque;
-    }
-    return Color({ h: id * 16, s: 100, l: 50 }).hexString() + opaque;
+  this.color = function (id, alpha) {
+    const c = new Color({ h: id * 16, s: 100, l: 50 });
+    c.alpha(alpha);
+    return c.rgbaString();
   }
 })();
