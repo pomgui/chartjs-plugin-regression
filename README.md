@@ -7,7 +7,7 @@ npm package as its calculation engine.
 
 ### Important
 - Only `bar`, `line`, and `scatter` chart types are supported.
-- The plugin works just fine since chart.js@2.5.0, however chart.js may have some problems handling certain color configuration (not related with the plugin). No problems have been found since chart.js@2.6.0.
+- The plugin works just fine with chart.js@2.5.0, however that version may have some problems handling certain color configuration (not related with the plugin). No problems have been found with chart.js@^2.6.0.
 - The plugin does not work with chart.js@3.x
 
 ## Demo
@@ -28,7 +28,7 @@ For a single chart, it needs to be listed in plugins section.
 
 ### Example:
 
-```javaScript
+```javascript
 new Chart(ctx, {
   type: 'bar',
   plugins: [
@@ -55,7 +55,7 @@ new Chart(ctx, {
 
 Also, it's possible to register the plugin for all the charts:
 
-```Javascript
+```javascript
 Chart.plugins.register(ChartRegressions);
 ```
 

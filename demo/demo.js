@@ -55,10 +55,11 @@ function piChart_LinkFn($scope, element) {
       options: {
         plugins: {
           // Global configuration of the plugin for all the datasets
-          regressions: {
-            onCompleteCalculation: showRegressionResults,
-            ...$scope.sample.optionsCfg
-          }
+          regressions: Object.assign({
+            onCompleteCalculation: showRegressionResults
+          },
+            $scope.sample.optionsCfg
+          )
         },
         responsive: true,
         maintainAspectRatio: false
