@@ -11,7 +11,7 @@
     "preversion": "npm test",
     "version": "node bin/setversion.js && npm run prepare && git add -A",
     "postversion": "git push && git push --tags",
-    "prepare": "rm dist/*.map; tsc && webpack --mode production"
+    "prepare": "find . -name '*.map' -delete; tsc && webpack --mode production"
   },
   "repository": {
     "type": "git",
