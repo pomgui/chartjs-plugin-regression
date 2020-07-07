@@ -1,3 +1,7 @@
+[![NPM version](https://img.shields.io/npm/v/chartjs-plugin-regression.svg)](https://npmjs.org/package/chartjs-plugin-regression) 
+[![License](http://img.shields.io/badge/license-ISC-blue.svg)](https://github.com/pomgui/chartjs-plugin-regression/blob/master/LICENSE)
+[![NPM downloads](https://img.shields.io/npm/dm/chartjs-plugin-regression.svg)](https://npmjs.org/package/chartjs-plugin-regression)
+
 # chartjs-plugin-regression
 Chart.js plugin to calculate and draw statistical linear, exponential, power, 
 logarithmic, and polynomial regressions using chart datasets data.
