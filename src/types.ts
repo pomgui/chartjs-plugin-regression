@@ -1,5 +1,10 @@
-import { ChartDataSets } from 'chart.js';
 import * as regression from 'regression';
+import {
+  Chart,
+  ChartType,
+  ChartDatasetProperties,
+  DefaultDataPoint
+} from 'chart.js';
 
 export type Type =
   | 'copy'
@@ -63,7 +68,10 @@ export interface Section extends BasicOptions {
   label?: string;
 }
 
-export interface ChartDataSetsEx extends ChartDataSets {
+export interface ChartDataSetsEx<
+  TType extends ChartType = ChartType,
+  TData = DefaultDataPoint<TType>
+> extends ChartDatasetProperties<TType, TData> {
   regressions: DatasetConfig;
 }
 
@@ -85,4 +93,10 @@ export interface OptionsConfig extends BasicOptions {
    * a chart have been calculated
    */
   onCompleteCalculation?: (chart: Chart) => void;
+}
+
+declare module 'chart.js' {
+  export interface PluginOptionsByType<TType extends ChartType> {
+    regressions: OptionsConfig;
+  }
 }

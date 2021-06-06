@@ -33,7 +33,6 @@
   "author": "Wilfredo Pomier (wpomier@pomgui.com)",
   "license": "ISC",
   "devDependencies": {
-    "@types/chart.js": "^2.9.22",
     "@types/regression": "^2.0.0",
     "prettier": "^2.0.5",
     "source-map-loader": "^1.0.1",
@@ -46,7 +45,7 @@
     "regression": "^2.0.1"
   },
   "peerDependencies": {
-    "chart.js": "^2.6.0"
+    "chart.js": "3.1.0"
   },
   "files": [
     "lib/**/*"
