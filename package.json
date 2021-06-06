@@ -1,6 +1,6 @@
 {
   "name": "chartjs-plugin-regression",
-  "version": "0.2.1",
+  "version": "3.0.0",
   "description": "Plugin to draw a regression line",
   "main": "lib/index.js",
   "scripts": {

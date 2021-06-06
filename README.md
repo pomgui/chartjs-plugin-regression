@@ -1,6 +1,6 @@
-[![NPM version](https://img.shields.io/npm/v/chartjs-plugin-regression.svg)](https://npmjs.org/package/chartjs-plugin-regression) 
+[![NPM version](https://img.shields.io/npm/v/chartjs-plugin-regression.svg)](https://npmjs.com/package/chartjs-plugin-regression) 
 [![License](http://img.shields.io/badge/license-ISC-blue.svg)](https://github.com/pomgui/chartjs-plugin-regression/blob/master/LICENSE)
-[![NPM downloads](https://img.shields.io/npm/dm/chartjs-plugin-regression.svg)](https://npmjs.org/package/chartjs-plugin-regression)
+[![NPM downloads](https://img.shields.io/npm/dm/chartjs-plugin-regression.svg)](https://npmjs.com/package/chartjs-plugin-regression)
 
 # chartjs-plugin-regression
 Chart.js plugin to calculate and draw statistical linear, exponential, power, 
@@ -11,20 +11,22 @@ npm package as its calculation engine.
 
 ### Important
 - Only `bar`, `line`, and `scatter` chart types are supported.
-- The plugin works just fine with chart.js@2.5.0, however that version may have some problems handling certain color configuration (not related with the plugin). No problems have been found with chart.js@^2.6.0.
-- The plugin does not work with chart.js@3.x
+- The plugin works with chart.js@3.x
+- To use the plugin for chart.js@2.x, then use [this version](https://www.npmjs.com/package/chartjs-plugin-regression/v/0.2.1) of the plugin
 
 ## Demo
 For a better understanding of the capabilities of this plugin, please see this 
 [Live Demo](https://pomgui.github.io/chartjs-plugin-regression/demo/).
 
 ## Download
-The [compressed](https://pomgui.github.io/chartjs-plugin-regression/dist/chartjs-plugin-regression-0.2.1.js)
+The [compressed](https://pomgui.github.io/chartjs-plugin-regression/dist/chartjs-plugin-regression-3.0.0.js)
 version includes the regression package.
 
 ## Installation
 
-    npm install --save chartjs-plugin-regression
+```sh
+npm install --save chartjs-plugin-regression
+```
 
 ## Usage
 
