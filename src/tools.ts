@@ -8,7 +8,7 @@ export function deepCopy<T>(source: T, fields?: string[]): T {
   let target: T = source;
   if (source && (typeof source === 'object' || Array.isArray(source))) {
     if (source instanceof Date)
-      return (new Date(source.getTime()) as unknown) as T;
+      return new Date(source.getTime()) as unknown as T;
     target = (Array.isArray(source) ? [] : {}) as any;
     if (!fields)
       for (const field in source) target[field] = deepCopy(source[field]);

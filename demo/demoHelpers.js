@@ -86,5 +86,5 @@ var helpers = new (function () {
     const c = new Color({ h: id * 16, s: 100, l: 50 });
     c.alpha(alpha);
     return c.rgbaString();
-  }
+  };
 })();

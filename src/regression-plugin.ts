@@ -16,7 +16,8 @@ interface ChartEx extends Chart {
 }
 
 class Plugin
-  implements PluginServiceGlobalRegistration, PluginServiceRegistrationOptions {
+  implements PluginServiceGlobalRegistration, PluginServiceRegistrationOptions
+{
   id = 'regressions';
 
   beforeInit(chart: any) {
