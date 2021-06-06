@@ -1,9 +1,5 @@
+import { Chart, Plugin as ChartPlugin } from 'chart.js';
 import { MetaDataSet } from './MetaData';
-import {
-  PluginServiceGlobalRegistration,
-  PluginServiceRegistrationOptions,
-  Easing
-} from 'chart.js';
 import { MetaSection } from './MetaSection';
 import { ChartDataSetsEx, OptionsConfig } from './types';
 
@@ -15,8 +11,7 @@ interface ChartEx extends Chart {
   $$id: number;
 }
 
-class Plugin
-  implements PluginServiceGlobalRegistration, PluginServiceRegistrationOptions {
+class Plugin implements ChartPlugin {
   id = 'regressions';
 
   beforeInit(chart: any) {
@@ -30,17 +25,18 @@ class Plugin
   beforeUpdate?(chart: Chart, options?: any): void {
     let o, p, r: OptionsConfig;
     const onComplete =
-      (o = chart.config.options) &&
-      (p = o.plugins) &&
-      (r = p.regressions) &&
-      r.onCompleteCalculation;
+      chart.config.options?.plugins?.regressions?.onCompleteCalculation;
+      // (o = chart.config.options) &&
+      // (p = o.plugins) &&
+      // (r = p.regressions) &&
+      // r.onCompleteCalculation;
 
     forEach(chart, (ds, meta, datasetIndex) => {
       meta = new MetaDataSet(chart, ds);
       const id = (chart as ChartEx).$$id * 1000 + datasetIndex;
       _metadataMap[id] = meta;
     });
-    if (onComplete) onComplete(chart);
+    onComplete?.(chart);
   }
 
   /**
@@ -52,12 +48,12 @@ class Plugin
   }
 
   /** Draws the vertical lines before the datasets are drawn */
-  beforeDatasetsDraw(chart: Chart, easing: Easing, options?: any): void {
+  beforeDatasetsDraw(chart: Chart, args: any, options?: any): void {
     forEach(chart, (ds, meta) => meta.drawRightBorders());
   }
 
   /** Draws the regression lines */
-  afterDatasetsDraw(chart: Chart, easing: Easing, options?: any): void {
+  afterDatasetsDraw(chart: Chart, args: any, options?: any): void {
     forEach(chart, (ds, meta) => meta.drawRegressions());
   }
 

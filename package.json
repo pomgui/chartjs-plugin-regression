@@ -1,9 +1,10 @@
 {
   "name": "chartjs-plugin-regression",
-  "version": "0.2.1",
+  "version": "3.0.0",
   "description": "Plugin to draw a regression line",
   "main": "lib/index.js",
   "scripts": {
+    "watch": "./node_modules/.bin/tsc-watch --onSuccess \"webpack -w --mode development\"",
     "build": "tsc && webpack --mode development",
     "format": "prettier --write \"src/**/*.ts\" \"demo/**/*.js\"",
     "lint": "tslint -p tsconfig.json",
@@ -11,7 +12,7 @@
     "preversion": "npm test",
     "version": "node bin/setversion.js && npm run prepare && git add -A",
     "postversion": "git push && git push --tags",
-    "prepare": "find . -name '*.map' -delete; tsc && webpack --mode production"
+    "prepare": "tsc && webpack --mode production"
   },
   "repository": {
     "type": "git",
@@ -32,10 +33,10 @@
   "author": "Wilfredo Pomier (wpomier@pomgui.com)",
   "license": "ISC",
   "devDependencies": {
-    "@types/chart.js": "^2.9.22",
     "@types/regression": "^2.0.0",
     "prettier": "^2.0.5",
     "source-map-loader": "^1.0.1",
+    "tsc-watch": "^4.4.0",
     "tslint": "^6.1.2",
     "tslint-config-prettier": "^1.18.0",
     "typescript": "^3.9.6"
@@ -44,7 +45,7 @@
     "regression": "^2.0.1"
   },
   "peerDependencies": {
-    "chart.js": "^2.6.0"
+    "chart.js": "3.1.0"
   },
   "files": [
     "lib/**/*"

@@ -4,13 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <title>chartjs-plugin-regression</title>
-    <script
-        src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.0/angular.min.js"></script>
     <link rel="stylesheet" href="demo.css">
-    <script
-        src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.js"></script>
-    <script type="text/javascript"
-        src="../dist/chartjs-plugin-regression-0.2.1.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.0/angular.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.1.0/chart.js"></script>
+
+    <script type="text/javascript" src="../dist/chartjs-plugin-regression-3.0.0.js"></script>
     <script type="text/javascript" src="./demoData.js"></script>
     <script type="text/javascript" src="./demoHelpers.js"></script>
     <script type="text/javascript" src="./demo.js"></script>
@@ -31,13 +29,11 @@
                         <div>
                             <div ng-if="sample.optionsCfg">
                                 <h3>Global Options Config</h3>
-                                <pre
-                                    ng-bind="$ctrl.format(sample.optionsCfg)"></pre>
+                                <pre ng-bind="$ctrl.format(sample.optionsCfg)"></pre>
                             </div>
                             <div ng-if="sample.datasetCfg">
                                 <h3>Dataset Config</h3>
-                                <pre
-                                    ng-bind="$ctrl.format(sample.datasetCfg)"></pre>
+                                <pre ng-bind="$ctrl.format(sample.datasetCfg)"></pre>
                             </div>
                         </div>
                     </div>

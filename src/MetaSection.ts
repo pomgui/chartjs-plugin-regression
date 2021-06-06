@@ -138,15 +138,18 @@ export class MetaSection implements Section, BasicOptions {
   }
 
   private _calculateCopySection(sectionData: regression.DataPoint[]) {
-    const from = this._meta.sections[this.copy.fromSectionIndex!],
-      r = (this.result = Object.assign({}, from.result)),
-      overwrite = this.copy.overwriteData,
-      data = this._meta.normalizedData;
+    const from = this._meta.sections[this.copy.fromSectionIndex!];
+    const r = (this.result = Object.assign({}, from.result));
+    const overwrite = this.copy.overwriteData;
+    const data = this._meta.normalizedData;
+
     r.points = sectionData.map(p => r.predict(p[0])) as any;
-    delete r.r2;
+    delete (r as any).r2;
+    
     if (overwrite != 'none') {
-      const dsdata = this._meta.dataset.data!,
-        isXY = this._meta.isXY;
+      const dsdata = this._meta.dataset.data!;
+      const isXY = this._meta.isXY;
+
       r.points.forEach(([x, y], i) => {
         const index = i + this.startIndex;
         if (

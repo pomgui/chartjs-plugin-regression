@@ -1,7 +1,7 @@
-import { Options, DataPoint } from 'regression';
-import { Section, LineOptions, ChartDataSetsEx, DatasetConfig } from './types';
-import { Point } from 'chart.js';
+import { DataPoint } from 'regression';
+import { Point, Chart } from 'chart.js';
 import { MetaSection } from './MetaSection';
+import { Section, ChartDataSetsEx, DatasetConfig } from './types';
 
 type GetXY = (x: number, y: number) => Point;
 
@@ -78,7 +78,7 @@ export class MetaDataSet {
   }
 
   drawRegressions() {
-    const ctx: CanvasRenderingContext2D = (this.chart as any).chart.ctx;
+    const ctx: CanvasRenderingContext2D = this.chart.ctx;
     ctx.save();
     try {
       this.sections.forEach(section => section.drawRegressions(ctx));
@@ -88,7 +88,7 @@ export class MetaDataSet {
   }
 
   drawRightBorders() {
-    const ctx: CanvasRenderingContext2D = (this.chart as any).chart.ctx;
+    const ctx: CanvasRenderingContext2D = this.chart.ctx;
     ctx.save();
     try {
       for (let i = 0; i < this.sections.length - 1; i++)
