@@ -12,7 +12,7 @@
     "preversion": "npm test",
     "version": "node bin/setversion.js && npm run prepare && git add -A",
     "postversion": "git push && git push --tags",
-    "prepare": "tsc && webpack --mode production && rm dist/*.map"
+    "prepare": "tsc && webpack --mode production"
   },
   "repository": {
     "type": "git",
